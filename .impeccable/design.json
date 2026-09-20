@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-18T00:00:00Z",
+  "title": "Design System: Aurelia & Co.",
+  "extensions": {
+    "colorMeta": {
+      "velvet":      { "role": "neutral",  "displayName": "Velvet",         "canonical": "#3b1020", "tonalRamp": ["#160510", "#24091a", "#3b1020", "#4f1a30", "#7a2a48", "#a8496f", "#d18aa6", "#f2d6e2"] },
+      "velvet-deep": { "role": "neutral",  "displayName": "Velvet Deep",    "canonical": "#24091a", "tonalRamp": ["#0f0309", "#24091a", "#3b1020", "#4f1a30", "#7a2a48", "#a8496f", "#d18aa6", "#f2d6e2"] },
+      "velvet-lift": { "role": "neutral",  "displayName": "Velvet Lift",    "canonical": "#4f1a30", "tonalRamp": ["#160510", "#24091a", "#3b1020", "#4f1a30", "#7a2a48", "#a8496f", "#d18aa6", "#f2d6e2"] },
+      "gilt":        { "role": "primary",  "displayName": "Gilt",           "canonical": "#d4a640", "tonalRamp": ["#3a2a08", "#5f430e", "#8c6516", "#b8862a", "#d4a640", "#e6bf5f", "#f3d98a", "#fbf0cc"] },
+      "gilt-hi":     { "role": "primary",  "displayName": "Gilt Highlight", "canonical": "#f3d98a", "tonalRamp": ["#3a2a08", "#5f430e", "#8c6516", "#b8862a", "#d4a640", "#e6bf5f", "#f3d98a", "#fff4c8"] },
+      "gilt-lo":     { "role": "primary",  "displayName": "Gilt Shadow",    "canonical": "#8c6516", "tonalRamp": ["#3a2a08", "#5f430e", "#8c6516", "#b8862a", "#d4a640", "#e6bf5f", "#f3d98a", "#fbf0cc"] },
+      "blush":       { "role": "neutral",  "displayName": "Blush",          "canonical": "#f6e4d6", "tonalRamp": ["#3d2416", "#6b4430", "#9a6a52", "#c49a80", "#e9c9b6", "#f6e4d6", "#fbf1ea", "#fff8e6"] },
+      "blush-deep":  { "role": "neutral",  "displayName": "Blush Deep",     "canonical": "#e9c9b6", "tonalRamp": ["#3d2416", "#6b4430", "#9a6a52", "#c49a80", "#e9c9b6", "#f6e4d6", "#fbf1ea", "#fffaf5"] },
+      "ink":         { "role": "neutral",  "displayName": "Ink",            "canonical": "#2a0a16", "tonalRamp": ["#160510", "#2a0a16", "#4a1e30", "#6b3a4c", "#8f5a6c", "#b58a98", "#d8bcc6", "#f2e4e9"] },
+      "ink-soft":    { "role": "neutral",  "displayName": "Ink Soft",       "canonical": "#6b3a4c", "tonalRamp": ["#160510", "#2a0a16", "#4a1e30", "#6b3a4c", "#8f5a6c", "#b58a98", "#d8bcc6", "#f2e4e9"] },
+      "jade":        { "role": "tertiary", "displayName": "Jade",           "canonical": "#2f6b57", "tonalRamp": ["#0d1f19", "#1a3d31", "#2f6b57", "#3f8a71", "#5ba58c", "#83c0ab", "#b3dbcc", "#e1f2ea"] },
+      "lapis":       { "role": "tertiary", "displayName": "Lapis",          "canonical": "#2b3f8f", "tonalRamp": ["#0d1330", "#1a2659", "#2b3f8f", "#3d54b3", "#5f75cc", "#8a9bdc", "#b9c4ea", "#e3e8f7"] },
+      "ruby":        { "role": "secondary","displayName": "Ruby",           "canonical": "#c2323f", "tonalRamp": ["#3a0d12", "#6e1a23", "#9c2633", "#c2323f", "#d95964", "#e8878f", "#f3b6bb", "#fbe3e5"] }
+    },
+    "typographyMeta": {
+      "display":  { "displayName": "Display",  "purpose": "Hero headline only; gilt-hi on velvet, balanced wrap." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles between two ornaments." },
+      "title":    { "displayName": "Title",    "purpose": "Shelf item names; brand mark at 1.35rem." },
+      "figure":   { "displayName": "Figure",   "purpose": "Running price (2.6rem) and visitors count (2.2rem); tabular-nums, steps on change." },
+      "body":     { "displayName": "Body",     "purpose": "Lede 1.1rem at 34ch; section intro at 52ch; footer 0.9rem at 60ch." },
+      "label":    { "displayName": "Label",    "purpose": "Panel titles, uppercase 0.08em in ink-soft; placed-strip label 700 / 0.06em in gilt." },
+      "small":    { "displayName": "Small",    "purpose": "Chips, option names (800), sub-labels in ink-soft, charm names at 0.72rem." }
+    },
+    "shadows": [
+      { "name": "sticker",        "value": "0 10px 28px -10px rgba(20,4,12,.6), 0 2px 6px -2px rgba(20,4,12,.4)", "purpose": "The house shadow; every blush surface laid over velvet (panels, tray body, shelf items, toast, room frame)." },
+      { "name": "gilt-glow",      "value": "0 6px 18px -6px rgba(212,166,64,.7), inset 0 1px 0 #fff4c8", "purpose": "Primary gilt button at rest." },
+      { "name": "gilt-glow-hover","value": "0 10px 24px -8px rgba(212,166,64,.9), inset 0 1px 0 #fff4c8", "purpose": "Primary gilt button on hover." },
+      { "name": "selection-ring", "value": "0 0 0 3px rgba(212,166,64,.25)", "purpose": "Selected option tile." },
+      { "name": "frame-mat",      "value": "inset 0 0 0 6px #24091a, inset 0 0 0 7px #8c6516", "purpose": "Inset mat inside the room frame, stacked under the sticker shadow." },
+      { "name": "metal-dot",      "value": "0 3px 8px -2px rgba(0,0,0,.35)", "purpose": "Colour swatch discs." }
+    ],
+    "motion": [
+      { "name": "ease",          "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The only easing; exponential ease-out for every settle, lift and step." },
+      { "name": "settle",        "value": "translateY(-14px) scale(1.15) -> rest, 260ms var(--ease) both", "purpose": "A charm landing on the piece. The one authored moment." },
+      { "name": "numstep",       "value": "translateY(-6px) -> 0, 260ms var(--ease)", "purpose": "Ledger figures stepping to a new value; never a fade." },
+      { "name": "lift",          "value": "translateY(-2px..-4px), 250-300ms var(--ease)", "purpose": "Cards and tiles on hover; buttons 1px." },
+      { "name": "charm-hover",   "value": "translateY(-3px) rotate(-6deg), 300ms var(--ease)", "purpose": "Live charm on the piece under cursor or focus." },
+      { "name": "toast",         "value": "translate(-50%, 20px) + opacity 0 -> rest, 350ms/300ms", "purpose": "Toast rising in from the bottom; auto-clears at 2.6s." },
+      { "name": "reduced-motion","value": "settle: none; charm-live transition: none", "purpose": "prefers-reduced-motion disables the settle and hover tilt." }
+    ],
+    "breakpoints": [
+      { "name": "tablet", "value": "1100px" },
+      { "name": "phone",  "value": "760px" }
+    ],
+    "ground": {
+      "glow": "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212,166,64,.22), transparent 60%)",
+      "lattice": "72px seamless SVG tile: diamond outline at 16% gilt, centre dot at 22% gilt, corner dots at 18% gilt-hi; fixed, z-index -1"
+    },
+    "fonts": [
+      { "family": "Gloock", "file": "public/fonts/gloock.woff2", "weight": "400" },
+      { "family": "Nunito", "file": "public/fonts/nunito.woff2", "weight": "200 1000" },
+      { "family": "Nunito", "file": "public/fonts/nunito-italic.woff2", "weight": "200 1000", "style": "italic" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Gilt Button",
+      "kind": "button",
+      "refersTo": "button-gilt",
+      "description": "The one primary action per view: Start decorating, Add to cart.",
+      "html": "<button class=\"ds-btn ds-btn-gilt\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.5L21 8H7M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z\"/></svg>Add to cart</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; border: 1px solid transparent; font: 700 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1), background .2s; } .ds-btn:hover { transform: translateY(-1px); } .ds-btn:active { transform: translateY(0); } .ds-btn:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-btn-gilt { background: linear-gradient(180deg, #f3d98a, #d4a640 55%, #b8862a); color: #2a0a16; box-shadow: 0 6px 18px -6px rgba(212,166,64,.7), inset 0 1px 0 #fff4c8; } .ds-btn-gilt:hover { box-shadow: 0 10px 24px -8px rgba(212,166,64,.9), inset 0 1px 0 #fff4c8; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action on velvet: See the shelves.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">See the shelves <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; border: 1px solid transparent; font: 700 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: transform .25s cubic-bezier(.16,1,.3,1), background .2s, border-color .2s; } .ds-btn:hover { transform: translateY(-1px); } .ds-btn:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-btn-ghost { background: transparent; color: #f3d98a; border-color: #8c6516; } .ds-btn-ghost:hover { border-color: #d4a640; background: #4f1a30; }"
+    },
+    {
+      "name": "Small Button",
+      "kind": "button",
+      "refersTo": "button-small",
+      "description": "Row-level action inside blush cards: Open in room.",
+      "html": "<button class=\"ds-btn-small\">Open in room</button>",
+      "css": ".ds-btn-small { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; font: 700 .85rem Nunito, 'Segoe UI', system-ui, sans-serif; border-radius: 999px; background: #3b1020; color: #f3d98a; border: 1px solid #8c6516; cursor: pointer; transition: transform .25s cubic-bezier(.16,1,.3,1), background .2s, border-color .2s; } .ds-btn-small:hover { background: #4f1a30; border-color: #d4a640; transform: translateY(-1px); } .ds-btn-small:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Header counters and the cart chip; bold figure in gilt-hi.",
+      "html": "<span class=\"ds-chip\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.5L21 8H7M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z\"/></svg>Cart <b>2</b></span> <span class=\"ds-badge\">demo counter</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #4f1a30; border: 1px solid #8c6516; color: #f6e4d6; font: 600 .875rem Nunito, 'Segoe UI', system-ui, sans-serif; } .ds-chip b { color: #f3d98a; font-variant-numeric: tabular-nums; } .ds-chip:hover { border-color: #d4a640; background: #3b1020; } .ds-badge { display: inline-block; font: 800 .65rem Nunito, 'Segoe UI', system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: #c2323f; color: #fff; vertical-align: middle; }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Blush sticker panel with uppercase title, ledger rows and an engraved price figure.",
+      "html": "<div class=\"ds-panel\"><h2 class=\"ds-panel-title\">Today's piece</h2><div class=\"ds-ledger\"><div><span>Base</span><b>Bracelet · Cable</b></div><div><span>Charms</span><b>3 / 8</b></div><div><span>Weight</span><b>8.1 g</b></div></div><div class=\"ds-price-row\"><span class=\"ds-price\">$80</span><span class=\"ds-price-note\">demo price</span></div></div>",
+      "css": ".ds-panel { background: #f6e4d6; color: #2a0a16; border-radius: 14px; padding: 16px 18px; box-shadow: 0 10px 28px -10px rgba(20,4,12,.6), 0 2px 6px -2px rgba(20,4,12,.4); font: 400 16px/1.5 Nunito, 'Segoe UI', system-ui, sans-serif; max-width: 320px; } .ds-panel-title { margin: 0 0 10px; font: 800 .8rem Nunito, 'Segoe UI', system-ui, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: #6b3a4c; } .ds-ledger { display: grid; gap: 6px; } .ds-ledger div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed #e9c9b6; padding-bottom: 6px; font-size: .9rem; } .ds-ledger span { color: #6b3a4c; } .ds-ledger b { font-variant-numeric: tabular-nums; } .ds-price-row { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; } .ds-price { font: 400 2.6rem/1 Gloock, 'Iowan Old Style', Georgia, serif; font-variant-numeric: tabular-nums; color: #2a0a16; } .ds-price-note { font-size: .8rem; color: #6b3a4c; font-style: italic; }"
+    },
+    {
+      "name": "Option Tile",
+      "kind": "custom",
+      "refersTo": "option-tile",
+      "description": "Selectable tile inside the tray: base, chain, colour, charm.",
+      "html": "<div class=\"ds-opts\"><button class=\"ds-opt\"><span class=\"ds-opt-name\">Bracelet</span><span class=\"ds-opt-sub\">8 charm slots · $40</span></button><button class=\"ds-opt ds-opt-on\" aria-pressed=\"true\"><span class=\"ds-opt-name\">Necklace</span><span class=\"ds-opt-sub\">10 charm slots · $60</span></button></div>",
+      "css": ".ds-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 14px; background: #f6e4d6; border-radius: 14px; max-width: 360px; } .ds-opt { display: grid; justify-items: center; gap: 4px; padding: 12px 8px; background: #fff; border: 2px solid #e9c9b6; border-radius: 12px; color: #2a0a16; font: 400 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; transition: border-color .2s, transform .25s cubic-bezier(.16,1,.3,1); } .ds-opt:hover { border-color: #d4a640; transform: translateY(-2px); } .ds-opt:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-opt-on { border-color: #d4a640; background: #fff8e6; box-shadow: 0 0 0 3px rgba(212,166,64,.25); } .ds-opt-name { font-weight: 800; } .ds-opt-sub { font-size: .8rem; color: #6b3a4c; }"
+    },
+    {
+      "name": "Tray Tabs",
+      "kind": "nav",
+      "refersTo": "tray-tab-on",
+      "description": "Pill tab track under the room: Base · Chain · Charms · Colour.",
+      "html": "<div class=\"ds-tray\" role=\"tablist\"><button role=\"tab\" class=\"ds-tray-tab\">Base</button><button role=\"tab\" class=\"ds-tray-tab\">Chain</button><button role=\"tab\" class=\"ds-tray-tab ds-tray-on\" aria-selected=\"true\">Charms</button><button role=\"tab\" class=\"ds-tray-tab\">Colour</button></div>",
+      "css": ".ds-tray { display: flex; gap: 4px; padding: 4px; background: #24091a; border: 1px solid #8c6516; border-radius: 999px; max-width: 420px; } .ds-tray-tab { flex: 1; background: none; border: 0; color: #e9c9b6; padding: 10px 12px; border-radius: 999px; font: 700 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; } .ds-tray-tab:hover { color: #f3d98a; } .ds-tray-tab:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-tray-on { background: linear-gradient(180deg, #f3d98a, #d4a640); color: #2a0a16; }"
+    },
+    {
+      "name": "Header",
+      "kind": "nav",
+      "refersTo": "chip",
+      "description": "Sticky blurred velvet-deep bar: Gloock brand with italic gilt ampersand, nav buttons, cart chip.",
+      "html": "<header class=\"ds-top\"><a class=\"ds-brand\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM19 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1z\"/></svg><span>Aurelia <em>&amp;</em> Co.</span></a><nav><button class=\"ds-nav\">The Room</button><button class=\"ds-nav\">Shelves</button><button class=\"ds-nav\">Charms</button></nav><span class=\"ds-chip\">Cart <b>0</b></span></header>",
+      "css": ".ds-top { display: flex; align-items: center; gap: 24px; padding: 12px 24px; background: rgba(36,9,26,.86); backdrop-filter: blur(10px); border-bottom: 1px solid #8c6516; font-family: Nunito, 'Segoe UI', system-ui, sans-serif; } .ds-brand { display: inline-flex; align-items: center; gap: 10px; color: #f3d98a; text-decoration: none; font: 400 1.35rem Gloock, 'Iowan Old Style', Georgia, serif; } .ds-brand em { color: #d4a640; font-style: italic; } .ds-top nav { display: flex; gap: 4px; } .ds-nav { background: none; border: 0; color: #f6e4d6; padding: 8px 12px; border-radius: 8px; font: 600 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; } .ds-nav:hover { background: #4f1a30; color: #f3d98a; } .ds-nav:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-chip { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #4f1a30; border: 1px solid #8c6516; color: #f6e4d6; font: 600 .875rem Nunito, 'Segoe UI', system-ui, sans-serif; } .ds-chip b { color: #f3d98a; }"
+    },
+    {
+      "name": "Wall Charm",
+      "kind": "card",
+      "refersTo": "wall-charm",
+      "description": "Velvet-lift tile hung from a gilt thread; the charm wall unit.",
+      "html": "<button class=\"ds-wall-charm\"><svg width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"#d4a640\" aria-hidden=\"true\"><path d=\"M12 20s-7-4.4-8.6-8.6C2.2 8.2 4.2 5 7.4 5c1.9 0 3.3 1 4.6 2.7C13.3 6 14.7 5 16.6 5c3.2 0 5.2 3.2 4 6.4C19 15.6 12 20 12 20z\"/></svg><b>Heart</b><span>$9 · 0.6 g</span></button>",
+      "css": ".ds-wall-charm { position: relative; display: grid; justify-items: center; gap: 4px; padding: 22px 10px 16px; background: #4f1a30; border: 1px solid #8c6516; border-radius: 14px; color: #f6e4d6; font: 400 16px Nunito, 'Segoe UI', system-ui, sans-serif; cursor: pointer; width: 140px; transition: transform .3s cubic-bezier(.16,1,.3,1), border-color .2s, background .2s; } .ds-wall-charm::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 18px; background: #8c6516; } .ds-wall-charm:hover { transform: translateY(-4px); border-color: #d4a640; background: #24091a; } .ds-wall-charm:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; } .ds-wall-charm b { margin-top: 8px; font-weight: 700; } .ds-wall-charm span { font-size: .8rem; color: #e9c9b6; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Select",
+      "kind": "input",
+      "refersTo": "option-tile",
+      "description": "The only form field: initial-letter picker inside the tray.",
+      "html": "<label class=\"ds-letter-pick\">Initial letter <select class=\"ds-select\"><option>A</option><option>B</option><option>C</option></select></label>",
+      "css": ".ds-letter-pick { display: flex; align-items: center; gap: 10px; font: 700 .9rem Nunito, 'Segoe UI', system-ui, sans-serif; color: #2a0a16; background: #f6e4d6; padding: 14px; border-radius: 14px; width: max-content; } .ds-select { font: inherit; padding: 6px 10px; border-radius: 8px; border: 2px solid #e9c9b6; background: #fff; color: #2a0a16; } .ds-select:hover { border-color: #d4a640; } .ds-select:focus-visible { outline: 2px solid #f3d98a; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Furnishable Room",
+    "overview": "Your jewelry box is a tiny isometric room you furnish. Charms are the furniture, the piece on the vanity is the profile, and the whole page is the velvet-lined interior that room sits in. The ground is drenched oxblood velvet with a faint gilt lattice tiled behind everything; the working surfaces (panels, trays, shelves) are blush champagne stickers laid on top of it, and gold hairlines, corner brackets and fleuron ornaments frame the important things. It is maximalist by abundance (fourteen charms, eight shelf pieces, three panels in view) rather than by noise: one display face, one body face, one accent metal.\n\nDensity is high but readable. Chips and tiles are compact, rounded and bold-weighted; big numbers (price, visitors) are set in the display face so they read as engraved figures, not dashboard stats. Motion is limited to things settling into place: a charm lands, a number steps, a card lifts a few pixels under the cursor. Nothing fades in, nothing slides across.\n\nConfirmed rejection: the cream-ground product grid with a hero photograph. The customizer is the hero; every photo slot is a swap-ready illustrated stand-in.",
+    "keyCharacteristics": [
+      "Oxblood velvet ground with a fixed, tiling gilt diamond-and-fleuron lattice",
+      "Blush champagne panels that carry all reading-heavy content in dark ink",
+      "Gold as trim, never as fill: hairlines, brackets, one gradient primary button, active tab",
+      "Gloock for display and for every large figure; Nunito bold for everything else",
+      "Pill controls and 14px sticker corners; nothing sharp",
+      "Settle-only motion at 260ms exponential ease-out"
+    ],
+    "rules": [
+      { "name": "The Trim Not Fill Rule", "body": "Gilt is applied as line, edge or single control: 1–2px borders, the corner brackets, the ornaments, one gradient primary button per view, the active tray tab. It is never a panel or section background.", "section": "colors" },
+      { "name": "The Two Grounds Rule", "body": "Every element sits on either velvet (light text: blush / gilt-hi) or blush (dark text: ink / ink-soft). No third ground; #fff is a tile inside blush, not a ground of its own.", "section": "colors" },
+      { "name": "The Small Stones Rule", "body": "Jade, lapis and ruby appear at chip, badge or icon scale only. A block of any of them is out of world.", "section": "colors" },
+      { "name": "The Engraved Figure Rule", "body": "Any number large enough to be read at a glance (price, visitor count) is set in Gloock with tabular-nums; numbers that change step in with numstep rather than fading.", "section": "typography" },
+      { "name": "The One Weight Rule", "body": "Gloock ships at 400 and is used at 400. Hierarchy comes from size and colour, never from faux bold.", "section": "typography" },
+      { "name": "The Sticker Rule", "body": "Blush on velvet gets the house shadow; velvet on velvet gets a hairline. Never both, never neither.", "section": "elevation" },
+      { "name": "The Lift On Hover Rule", "body": "Interactive cards and tiles rise 2–4px on hover (translateY) at 250–300ms on --ease; buttons rise 1px. Nothing scales or glows on hover except the primary button's gilt glow deepening.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put reading-heavy content on blush ({colors.blush}) in ink; keep velvet for headlines, chips and the ground.",
+      "Do give every blush surface the sticker shadow and every velvet surface a 1px gilt-lo hairline (The Sticker Rule).",
+      "Do set large figures in Gloock with tabular-nums and step them with numstep (The Engraved Figure Rule).",
+      "Do use the pill (999px) for every control and 14px (--r) for every sticker surface.",
+      "Do mark placeholder data with the ruby badge (\"demo counter\", \"demo notes\", \"demo price\") wherever a number could be mistaken for real.",
+      "Do keep hover as a small lift (1–4px) on --ease, and honour prefers-reduced-motion.",
+      "Do frame headline sections with the line-and-fleuron ornament above and its flipped twin below."
+    ],
+    "donts": [
+      "Don't fill a panel, section or button ground with flat gilt; gilt is trim, gradient on the one primary button, or the active tab (The Trim Not Fill Rule).",
+      "Don't introduce a third ground; there is velvet and there is blush.",
+      "Don't fade or slide content in; things settle, lift, or step.",
+      "Don't set Gloock in bold, uppercase, or wide tracking; it ships at 400 and one tracking (−0.01em).",
+      "Don't use jade, lapis or ruby larger than a chip, badge or charm stone.",
+      "Don't replace the SVG stand-ins with layout-changing photos; the art wells (180px shelf, 110px tile) are the photo slots."
+    ]
+  }
+}
