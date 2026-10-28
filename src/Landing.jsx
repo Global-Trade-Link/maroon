@@ -134,6 +134,11 @@ export default function Landing({ onOpen, onAdd, cart }) {
                 Shop best sellers
               </a>
             </div>
+            <p className="hero-vow">
+              <span>Set by hand</span>
+              <span>18K gold PVD</span>
+              <span>Waterproof</span>
+            </p>
           </div>
 
           <button
@@ -142,6 +147,10 @@ export default function Landing({ onOpen, onAdd, cart }) {
             aria-label={`Open the builder with ${hero.name}`}
           >
             <span className="hero-oval" aria-hidden="true" />
+            <Crest className="oval-crest" />
+            {CHARMS.map((c, i) => (
+              <img key={c.id} className={`hero-float hero-float-${'abc'[i]}`} src={c.img} alt="" aria-hidden="true" />
+            ))}
             <Piece form="bracelet" chain="cable" charms={seedRack('bracelet', hero.charms)} />
             <span className="hero-tag">
               <b>{hero.name}</b>

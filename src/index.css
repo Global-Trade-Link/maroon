@@ -3,6 +3,7 @@
 @font-face { font-family: 'League Spartan'; src: url('/fonts/spartan.woff2') format('woff2'); font-weight: 300 800; font-display: swap; }
 
 :root {
+  --damask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='none' stroke='%236e1f27' stroke-opacity='.11' stroke-width='1.1' stroke-linecap='round'><path d='M48 28C41 37 41 46 48 54C55 46 55 37 48 28Z'/><path d='M48 54C40 57 33 53 32 47C31 41 37 39 40 43'/><path d='M48 54C56 57 63 53 64 47C65 41 59 39 56 43'/><path d='M48 54V66M43 66H53'/><path d='M0 8C4 4 4 -4 0 -8C-4 -4 -4 4 0 8Z' transform='translate(0 0)'/><path d='M96 8C100 4 100 -4 96 -8C92 -4 92 4 96 8Z'/><path d='M0 104C4 100 4 92 0 88C-4 92 -4 100 0 104Z'/><path d='M96 104C100 100 100 92 96 88C92 92 92 100 96 104Z'/></g><g fill='%236e1f27' fill-opacity='.12'><circle cx='48' cy='22' r='1.6'/><circle cx='0' cy='48' r='1.4'/><circle cx='96' cy='48' r='1.4'/><circle cx='48' cy='96' r='1.4'/><circle cx='48' cy='0' r='1.4'/></g></svg>");
   --bg: #fbf8f2;
   --bg-tint: #f5efe4;
   --bg-well: #efe6d7;
@@ -146,6 +147,7 @@ a { color: inherit; text-underline-offset: 4px; }
 .frame {
   position: relative;
   color: var(--maroon);
+  background: radial-gradient(ellipse at 50% 50%, rgba(251, 248, 242, 0.92) 18%, rgba(251, 248, 242, 0) 72%), var(--damask);
   padding: clamp(56px, 7vw, 104px) clamp(28px, 7vw, 120px);
 }
 .frame::before {
@@ -153,6 +155,14 @@ a { color: inherit; text-underline-offset: 4px; }
   position: absolute;
   inset: clamp(12px, 1.6vw, 22px);
   border: 1px solid var(--line-strong);
+  pointer-events: none;
+}
+/* beaded inner rule, like the milgrain edge on a setting */
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: clamp(20px, 2.4vw, 32px);
+  border: 2px dotted var(--line-strong);
   pointer-events: none;
 }
 .corner {
@@ -204,8 +214,53 @@ a { color: inherit; text-underline-offset: 4px; }
   box-shadow: inset 0 0 0 1px var(--line), inset 0 0 0 10px var(--card), inset 0 0 0 11px var(--line);
   transition: box-shadow 0.4s var(--ease);
 }
+.hero-oval::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 2.5px dotted var(--maroon-soft);
+  opacity: 0.7;
+}
 .hero-piece:hover .hero-oval { box-shadow: inset 0 0 0 1px var(--line-strong), inset 0 0 0 10px var(--card), inset 0 0 0 11px var(--line-strong); }
 .hero-piece .piece { position: relative; width: 100%; height: auto; }
+.hero-piece .oval-crest {
+  position: absolute;
+  top: -4%;
+  left: 50%;
+  width: 34%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 8px;
+}
+.hero-float {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 12px rgba(79, 19, 26, 0.25));
+  animation: drift 7s ease-in-out infinite;
+}
+.hero-float-a { width: 15%; left: -9%; top: 18%; --r: -14deg; }
+.hero-float-b { width: 13%; right: -8%; top: 46%; --r: 12deg; animation-delay: -2.4s; }
+.hero-float-c { width: 24%; left: -8%; bottom: 10%; --r: 18deg; animation-delay: -4.6s; }
+@keyframes drift {
+  0%, 100% { transform: rotate(var(--r)) translateY(0); }
+  50% { transform: rotate(calc(var(--r) * -0.4)) translateY(-8px); }
+}
+.hero-vow {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 0;
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--maroon);
+}
+.hero-vow span + span::before { content: '\2666'; margin: 0 12px; font-size: 0.6rem; color: var(--maroon-soft); vertical-align: 1px; }
 .hero-tag {
   position: absolute;
   left: 50%;
@@ -398,7 +453,7 @@ a { color: inherit; text-underline-offset: 4px; }
   flex-wrap: wrap;
   margin-bottom: clamp(24px, 3vw, 40px);
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 3px double var(--line-strong);
 }
 .shelf-head h2 { font-size: clamp(2.6rem, 4.6vw, 3.8rem); }
 .shelf-head p { max-width: 46ch; font-size: 1.08rem; }
@@ -435,9 +490,9 @@ button.item-media:hover .piece, .build-media:hover .piece { transform: translate
 
 /* ---------- styled by you ---------- */
 .styled {
+  background: radial-gradient(ellipse at 50% 30%, var(--bg-tint) 20%, rgba(245, 239, 228, 0.6) 70%), var(--damask), var(--bg-tint);
   text-align: center;
   padding: clamp(48px, 6vw, 84px) var(--gutter);
-  background: var(--bg-tint);
   border-block: 1px solid var(--line);
 }
 .styled h2 { font-size: clamp(2.8rem, 5.4vw, 4.4rem); }
@@ -852,7 +907,10 @@ button.tile:hover img { box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 6px var(
   .hero-lede { font-size: 1.02rem; margin-top: 10px; }
   .hero-acts { margin-top: 18px; gap: 8px; flex-wrap: nowrap; }
   .hero-acts .btn { padding: 12px 16px 10px; font-size: 0.7rem; letter-spacing: 0.12em; }
-  .hero-piece { width: clamp(200px, calc(100svh - 540px), 340px); padding-bottom: 48px; }
+  .hero-piece { width: clamp(200px, calc(100svh - 580px), 330px); padding-bottom: 48px; }
+  .hero-vow { margin-top: 14px; font-size: 0.6rem; letter-spacing: 0.1em; }
+  .hero-vow span + span::before { margin: 0 6px; }
+  .frame::after { inset: 18px; }
   .hero-story ul { gap: 12px; }
   .hero-story li span { font-size: 0.68rem; letter-spacing: 0.08em; }
   .hero-tag { padding: 8px 14px 6px; gap: 10px; }
