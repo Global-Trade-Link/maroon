@@ -96,6 +96,9 @@ export function Frame({ className = '', children }) {
       {['tl', 'tr', 'bl', 'br'].map((at) => (
         <Corner key={at} at={at} />
       ))}
+      {['t', 'r', 'b', 'l'].map((at) => (
+        <span key={at} className={`vine vine-${at}`} aria-hidden="true" />
+      ))}
       {children}
     </div>
   )

@@ -30,6 +30,9 @@ const SHOWCASE = {
   bracelet: { chain: 'cable', charms: ['mushroom', 'hamsa', 'ballet', 'hamsa', 'mushroom'] },
 }
 
+const SHOWS = [PRESETS[0], BRACELETS[4], BRACELETS[2], PRESETS[1]]
+
+
 const BEST = [PRESETS[0], PRESETS[2], BRACELETS[2], PRESETS[1], BRACELETS[4]]
 
 function Slot({ label = 'Photograph arriving' }) {
@@ -74,7 +77,16 @@ function Item({ media, name, price, onMedia, onAdd, label }) {
 }
 
 export default function Landing({ onOpen, onAdd, cart }) {
-  const hero = PRESETS[0]
+  const [show, setShow] = useState(0)
+  const [hold, setHold] = useState(false)
+  const hero = SHOWS[show]
+
+  // The hero turns through the bracelets; pointer over it holds the current one.
+  useEffect(() => {
+    if (hold || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const t = setTimeout(() => setShow((i) => (i + 1) % SHOWS.length), 5200)
+    return () => clearTimeout(t)
+  }, [show, hold])
   const [soon, setSoon] = useState('')
 
   useEffect(() => {
@@ -141,22 +153,48 @@ export default function Landing({ onOpen, onAdd, cart }) {
             </p>
           </div>
 
-          <button
+          <div
             className="hero-piece"
-            onClick={() => onOpen(hero)}
-            aria-label={`Open the builder with ${hero.name}`}
+            onPointerMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect()
+              e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width - 0.5) * 2)
+              e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height - 0.5) * 2)
+            }}
+            onPointerEnter={() => setHold(true)}
+            onPointerLeave={(e) => {
+              e.currentTarget.style.setProperty('--mx', 0)
+              e.currentTarget.style.setProperty('--my', 0)
+              setHold(false)
+            }}
           >
-            <span className="hero-oval" aria-hidden="true" />
-            <Crest className="oval-crest" />
-            {CHARMS.map((c, i) => (
-              <img key={c.id} className={`hero-float hero-float-${'abc'[i]}`} src={c.img} alt="" aria-hidden="true" />
-            ))}
-            <Piece form="bracelet" chain="cable" charms={seedRack('bracelet', hero.charms)} />
-            <span className="hero-tag">
+            <button
+              className="hero-open"
+              onClick={() => onOpen(hero)}
+              aria-label={`Open the builder with ${hero.name}`}
+            >
+              <span className="hero-oval" aria-hidden="true" />
+              <Crest className="oval-crest" />
+              {CHARMS.map((c, i) => (
+                <img key={c.id} className={`hero-float hero-float-${'abc'[i]}`} src={c.img} alt="" aria-hidden="true" />
+              ))}
+              <Piece key={hero.id} form="bracelet" chain={hero.chain} charms={seedRack('bracelet', hero.charms)} />
+            </button>
+            <div className="hero-tag" aria-live="polite">
               <b>{hero.name}</b>
               <span>{npr(priceOf(hero.chain, hero.charms))}</span>
-            </span>
-          </button>
+              <span className="hero-dots">
+                {SHOWS.map((p, i) => (
+                  <button
+                    key={p.id}
+                    className={i === show ? 'is-on' : ''}
+                    onClick={() => setShow(i)}
+                    aria-label={`Show ${p.name}`}
+                    aria-pressed={i === show}
+                  />
+                ))}
+              </span>
+            </div>
+          </div>
         </Frame>
       </section>
 
