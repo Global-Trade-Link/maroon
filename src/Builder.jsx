@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Flourish, Frame } from './Ornament.jsx'
 import Piece, { VIEW, geometry } from './Piece.jsx'
 import { ASSEMBLY, CHAINS, CHARMS, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
 
@@ -115,38 +116,31 @@ export default function Builder({ start, onBack, onAdd }) {
 
   return (
     <div className={`builder${drag ? ' is-dragging' : ''}`}>
-      <div className="builder-steps">
-        {[
-          ['Choose your chain', 'Pick a chain and it appears on the bench — that is your canvas.'],
-          ['Pick your charms', 'Add a charm and it lands on the next free link. Then drag it where you want it.'],
-          ['Choose your assembly', 'Keep your exact layout, or let the studio space it by weight.'],
-        ].map(([title, body], i) => (
-          <div className="step" key={title}>
-            <span className="step-num">{i + 1}</span>
-            <h3>{title}</h3>
-            <p>{body}</p>
-          </div>
-        ))}
-      </div>
-
+      <header className="masthead">
+        <button className="bench-back" onClick={onBack}>
+          ← All pieces
+        </button>
+        <a className="wordmark" href="#top" onClick={onBack} aria-label="Maroon, back to the shop">
+          <img src="/logo-mark.png" alt="" width="104" height="80" />
+        </a>
+      </header>
       <div className="builder-grid">
         <div className="bench">
-          <button className="bench-back" onClick={onBack}>
-            ← All pieces
-          </button>
-          <div className="bench-well" ref={svgRef}>
-            <Piece
-              form={form}
-              chain={chain}
-              charms={rack}
-              onGrab={grab}
-              heldIndex={drag ? drag.index : -1}
-              showSlots={!!drag}
-              hoverSlot={drag ? drag.over : -1}
-              ghost={drag ? drag.at : null}
-              idle={!drag}
-            />
-          </div>
+          <Frame className="bench-frame">
+            <div className="bench-well" ref={svgRef}>
+              <Piece
+                form={form}
+                chain={chain}
+                charms={rack}
+                onGrab={grab}
+                heldIndex={drag ? drag.index : -1}
+                showSlots={!!drag}
+                hoverSlot={drag ? drag.over : -1}
+                ghost={drag ? drag.at : null}
+                idle={!drag}
+              />
+            </div>
+          </Frame>
 
           <div className="bench-bar">
             <button
@@ -203,8 +197,9 @@ export default function Builder({ start, onBack, onAdd }) {
 
         <div className="panel">
           <section>
-            <h2>
-              <em>Step 1</em> Choose your chain
+            <h2 className="panel-title">
+              <span className="panel-num" aria-label="Step 1">1</span>
+              Choose your chain
             </h2>
             <p className="panel-lede">
               Every design starts here. Pick a form, pick a chain, and it draws itself on the bench.
@@ -234,8 +229,9 @@ export default function Builder({ start, onBack, onAdd }) {
                 >
                   <img src={c.img} alt="" width="120" height="120" loading="lazy" />
                   <strong>{c.name}</strong>
-                  <small>{c.gauge}</small>
-                  <span className="tile-price">{npr(c.price)}</span>
+                  <span className="tile-price">
+                    {c.gauge} · {npr(c.price)}
+                  </span>
                 </button>
               ))}
             </div>
@@ -243,8 +239,9 @@ export default function Builder({ start, onBack, onAdd }) {
           </section>
 
           <section>
-            <h2>
-              <em>Step 2</em> Pick your charms &amp; placement
+            <h2 className="panel-title">
+              <span className="panel-num" aria-label="Step 2">2</span>
+              Pick your charms &amp; placement
             </h2>
             <p className="panel-lede">
               Charms land on the next free link. Drag any of them around the chain — or onto the
@@ -258,7 +255,6 @@ export default function Builder({ start, onBack, onAdd }) {
                   <div key={c.id} className={`tile${n ? ' is-on' : ''}`}>
                     <img src={c.img} alt="" height="96" loading="lazy" />
                     <strong>{c.name}</strong>
-                    <small>{c.story}</small>
                     <span className="tile-price">{npr(c.price)}</span>
                     <div className="step-count">
                       <button onClick={() => drop(c.id)} disabled={!n} aria-label={`Remove one ${c.name}`}>
@@ -284,8 +280,9 @@ export default function Builder({ start, onBack, onAdd }) {
           </section>
 
           <section>
-            <h2>
-              <em>Step 3</em> Choose your assembly
+            <h2 className="panel-title">
+              <span className="panel-num" aria-label="Step 3">3</span>
+              Choose your assembly
             </h2>
             <div className="choices">
               {ASSEMBLY.map((a) => (
@@ -302,6 +299,8 @@ export default function Builder({ start, onBack, onAdd }) {
               ))}
             </div>
           </section>
+
+          <Flourish />
 
           <section className="panel-sum">
             <h2>Your piece</h2>

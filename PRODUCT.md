@@ -24,20 +24,19 @@ Not a catalog of fixed SKUs. Every piece is composable: base + charms, arranged 
 
 ## Operating Context
 
-Landing page (maximalist, shows the product range) and a customizer surface. Real product photography will be supplied by the user later; the demo uses illustrated/CSS-rendered stand-ins that must be easy to swap.
+Landing page (shows the full product range) and a customizer surface. Real product photography will be supplied by the user later; the demo uses illustrated/CSS-rendered stand-ins that must be easy to swap.
 
 ## Capabilities and Constraints
 
-- Products: bracelets, necklaces; charms attach to either.
+- Products (Oct 2026 range): charm necklace, charm bracelet, charm earrings, charm brooch, charm keyring, belts, armcuffs. The builder covers necklace and bracelet; the rest await photography.
 - Customizer (confirmed scope): pick base type (bracelet/necklace), pick chain/material, add/remove/reorder charms on a live preview, running price, add-to-cart summary.
 - Not in demo scope (undecided): engraving, sizing, gift packaging, payments, accounts.
 - Brand: Maroon (from the supplied logo: cream ground, maroon wordmark, wreath monogram).
-- Vibe (user's binding constraint): gold / luxe / ornate; visual direction is maximalist.
+- Visual brief (client notes, Oct 2026): lightest beige background; product names simple and black; sub-headings and body maroon and cursive; CTAs maroon with white text.
 
 ## Brand Commitments
 
-- Maximalist landing page (user's explicit requirement).
-- Gold / luxe / ornate register (user's choice).
+- Client-pinned palette and type voices (see Capabilities). Promise strip: fast dispatch and express delivery, waterproof, hypoallergenic, 18K gold PVD plated, safe payments.
 - Wordmark and monogram supplied by the user (assets/logo.jpg).
 
 ## Evidence on Hand

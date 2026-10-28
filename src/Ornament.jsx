@@ -1,177 +1,102 @@
-// House ornaments. Everything here is geometry — arcs, rings, leaves — drawn to
-// the same 1.4–1.8 stroke so the page reads as one engraved plate.
+// Engraved scrollwork for the framed panels. All geometry, one stroke weight,
+// drawn in currentColor so the frame takes the maroon from its parent.
 
-export function Laurel({ flip = false }) {
-  const leaves = Array.from({ length: 9 }, (_, i) => {
-    const t = i / 8
-    return {
-      x: 6 + t * 96,
-      y: 26 - Math.sin(t * Math.PI) * 15,
-      a: -46 + t * 92,
-      r: 1 - Math.abs(t - 0.5) * 0.7,
-    }
-  })
+// One arm of the corner: a leafy stem running along the top edge with scrolls
+// curling off it. The corner mirrors it across the diagonal for the side edge.
+const ARM = (
+  <>
+    <g fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M22 34C48 24 74 48 106 38C134 29 160 27 196 38" />
+      <path d="M62 38C57 56 72 66 83 58C90 53 86 44 79 47" />
+      <path d="M132 31C127 16 140 7 151 11C159 14 157 24 149 23" />
+      <path d="M196 38C203 42 202 51 194 51C188 51 188 44 193 44" />
+      <path d="M96 40C100 50 98 60 92 66" />
+      <path d="M166 31C168 22 176 18 184 21" />
+    </g>
+    <g fill="currentColor">
+      <path d="M88 41C97 50 109 52 118 47C109 42 97 38 88 41Z" opacity="0.5" />
+      <path d="M150 28C158 20 171 17 180 22C171 28 160 30 150 28Z" opacity="0.5" />
+      <path d="M38 30C44 19 55 14 64 16C58 23 49 29 38 30Z" opacity="0.5" />
+      <path d="M110 36C114 26 122 22 130 23C126 30 119 35 110 36Z" opacity="0.35" />
+      <circle cx="122" cy="40" r="2.2" />
+      <circle cx="176" cy="33" r="1.8" />
+      <circle cx="206" cy="40" r="1.6" />
+    </g>
+  </>
+)
+
+// Drawn for the top-left corner; the frame mirrors it into the other three.
+function Corner({ at }) {
   return (
-    <svg
-      className="laurel"
-      viewBox="0 0 108 34"
-      aria-hidden="true"
-      style={{ transform: flip ? 'scaleX(-1)' : undefined }}
-    >
-      <path
-        d={`M4 27 ${leaves.map((l) => `L${l.x.toFixed(1)} ${l.y.toFixed(1)}`).join(' ')}`}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.9"
-      />
-      {leaves.map((l, i) => (
-        <g key={i} transform={`translate(${l.x} ${l.y}) rotate(${l.a})`}>
-          <ellipse rx={7 * l.r} ry={2.6 * l.r} cx={6 * l.r} fill="currentColor" opacity="0.9" />
-          <ellipse rx={6 * l.r} ry={2.2 * l.r} cx={-5 * l.r} cy="3" fill="currentColor" opacity="0.6" />
-        </g>
-      ))}
+    <svg className={`corner corner-${at}`} viewBox="0 0 212 212" aria-hidden="true">
+      {ARM}
+      <g transform="matrix(0 1 1 0 0 0)">{ARM}</g>
+      <g fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M22 34C14 22 22 10 34 12C44 14 44 26 36 28C30 29 28 22 33 21" />
+        <path d="M34 22C10 14 14 34 22 34" />
+        <path d="M30 50C42 48 48 42 50 30" />
+        <path d="M36 66C56 64 64 56 66 36" />
+        <path d="M18 18L62 62" />
+      </g>
+      <path d="M16 16C40 22 58 40 64 64C40 58 22 40 16 16Z" fill="currentColor" opacity="0.22" />
+      <path d="M16 16C40 22 58 40 64 64C40 58 22 40 16 16Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="70" cy="70" r="3.2" fill="currentColor" />
+      <circle cx="78" cy="78" r="1.8" fill="currentColor" />
     </svg>
   )
 }
 
-export function Rule({ children }) {
+// Centre crest: a fleuron flanked by two scrolls with long tails.
+export function Crest({ className = '' }) {
   return (
-    <div className="rule">
-      <Laurel />
-      <span>{children}</span>
-      <Laurel flip />
+    <svg className={`crest ${className}`} viewBox="0 0 240 64" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+        <path d="M120 42C100 46 84 40 76 30C70 22 76 13 84 15C90 17 90 25 84 25" />
+        <path d="M120 42C140 46 156 40 164 30C170 22 164 13 156 15C150 17 150 25 156 25" />
+        <path d="M76 30C60 42 34 44 12 36" />
+        <path d="M164 30C180 42 206 44 228 36" />
+        <path d="M58 39C54 31 46 29 42 33" />
+        <path d="M182 39C186 31 194 29 198 33" />
+        <path d="M100 32C98 24 104 18 110 20" />
+        <path d="M140 32C142 24 136 18 130 20" />
+        <path d="M92 54H148" />
+      </g>
+      <path d="M120 4C111 17 111 31 120 42C129 31 129 17 120 4Z" fill="currentColor" opacity="0.18" />
+      <path d="M120 4C111 17 111 31 120 42C129 31 129 17 120 4Z" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <g fill="currentColor">
+        <circle cx="120" cy="54" r="2.6" />
+        <circle cx="8" cy="35" r="1.8" />
+        <circle cx="232" cy="35" r="1.8" />
+      </g>
+    </svg>
+  )
+}
+
+// Hairline rule with a lozenge knot, used between headline and lede.
+export function Flourish({ className = '' }) {
+  return (
+    <svg className={`flourish ${className}`} viewBox="0 0 320 20" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+        <path d="M4 10H118M202 10H316" />
+        <path d="M118 10C126 2 139 2 141 9C142 15 135 16 133 12" />
+        <path d="M202 10C194 2 181 2 179 9C178 15 185 16 187 12" />
+        <path d="M141 10H151M169 10H179" />
+      </g>
+      <path d="M160 2L168 10L160 18L152 10Z" fill="currentColor" />
+      <circle cx="4" cy="10" r="1.8" fill="currentColor" />
+      <circle cx="316" cy="10" r="1.8" fill="currentColor" />
+    </svg>
+  )
+}
+
+// A hairline rule around a full-width section, scrollwork in each corner.
+export function Frame({ className = '', children }) {
+  return (
+    <div className={`frame ${className}`}>
+      {['tl', 'tr', 'bl', 'br'].map((at) => (
+        <Corner key={at} at={at} />
+      ))}
+      {children}
     </div>
-  )
-}
-
-// Fixed vine running down both page edges, the way an engraved card is bordered.
-export function VineEdge({ side }) {
-  const id = `vine-${side}`
-  return (
-    <svg className={`edge edge-${side}`} aria-hidden="true">
-      <defs>
-        <pattern id={id} width="30" height="132" patternUnits="userSpaceOnUse">
-          <path
-            d="M15 0 C6 22 24 44 15 66 C6 88 24 110 15 132"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.1"
-            opacity="0.75"
-          />
-          {[12, 34, 56, 78, 100, 122].map((y, i) => (
-            <g key={y} transform={`translate(15 ${y}) rotate(${i % 2 ? 34 : -34})`}>
-              <ellipse rx="8" ry="2.9" cx={i % 2 ? 8 : -8} fill="currentColor" opacity="0.7" />
-            </g>
-          ))}
-          {[23, 67, 111].map((y) => (
-            <circle key={y} cx="15" cy={y} r="2" fill="currentColor" opacity="0.55" />
-          ))}
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${id})`} />
-    </svg>
-  )
-}
-
-// Guilloché: the interlaced arc engraving on the back of a watch case.
-export function Guilloche({ id = 'guilloche' }) {
-  return (
-    <svg className="guilloche" aria-hidden="true">
-      <defs>
-        <pattern id={id} width="54" height="54" patternUnits="userSpaceOnUse">
-          {[10, 18, 26].map((r) => (
-            <circle key={r} cx="27" cy="27" r={r} fill="none" stroke="currentColor" strokeWidth="0.9" />
-          ))}
-          {[10, 18, 26].map((r) => (
-            <circle key={`o${r}`} cx="0" cy="0" r={r} fill="none" stroke="currentColor" strokeWidth="0.9" />
-          ))}
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${id})`} />
-    </svg>
-  )
-}
-
-// Scalloped edge between two bands — the cut of a jeweller's display card.
-export function Scallop({ tone, flip = false }) {
-  const id = `scallop-${tone}${flip ? '-f' : ''}`
-  return (
-    <svg
-      className={`scallop${flip ? ' is-flip' : ''}`}
-      aria-hidden="true"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <pattern id={id} width="44" height="22" patternUnits="userSpaceOnUse">
-          <path d="M0 0 Q22 30 44 0 Z" fill={tone} />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${id})`} />
-    </svg>
-  )
-}
-
-export function Seal({ label = 'Est.' }) {
-  return (
-    <svg className="seal" viewBox="0 0 120 120" aria-hidden="true">
-      <circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" strokeWidth="1.2" />
-      <circle cx="60" cy="60" r="49" fill="none" stroke="currentColor" strokeWidth="2.6" />
-      <circle cx="60" cy="60" r="43" fill="none" stroke="currentColor" strokeWidth="0.9" />
-      {Array.from({ length: 36 }, (_, i) => (
-        <circle
-          key={i}
-          cx={60 + 52.5 * Math.cos((i * Math.PI) / 18)}
-          cy={60 + 52.5 * Math.sin((i * Math.PI) / 18)}
-          r="1.5"
-          fill="currentColor"
-        />
-      ))}
-      <text x="60" y="73" textAnchor="middle" className="seal-mark">
-        M
-      </text>
-      <text x="60" y="94" textAnchor="middle" className="seal-label">
-        {label}
-      </text>
-    </svg>
-  )
-}
-
-const ICONS = {
-  cast: (
-    <>
-      <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" />
-      <path d="M12 7.5 13.7 11l3.8.4-2.8 2.6.8 3.7L12 15.9 8.5 17.7l.8-3.7L6.5 11.4 10.3 11z" />
-    </>
-  ),
-  solder: (
-    <>
-      <path d="M4 19.5 10 13.5" />
-      <path d="M9 12.5a4.5 4.5 0 1 1 6.4 4.1" />
-      <path d="M14.5 3.5 20.5 9.5 17 13 11 7z" />
-    </>
-  ),
-  pouch: (
-    <>
-      <path d="M6.5 9.5h11l2 10.5a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5z" />
-      <path d="M8.5 9.5V7a3.5 3.5 0 0 1 7 0v2.5" />
-      <path d="M6.5 13.5h11" />
-    </>
-  ),
-}
-
-export function Icon({ name }) {
-  return (
-    <svg
-      className="icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {ICONS[name]}
-    </svg>
   )
 }

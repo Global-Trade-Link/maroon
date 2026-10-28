@@ -30,13 +30,22 @@ export default function App() {
           }}
         />
       ) : (
-        <Landing onOpen={setStart} cart={cart.length} />
+        <Landing
+          onOpen={setStart}
+          onAdd={(item) => {
+            setCart((c) => [...c, item])
+            setReceipt(item)
+          }}
+          cart={cart.length}
+        />
       )}
 
       {receipt && (
         <p className="receipt" role="status">
-          Added — {receipt.charms.length} charm{receipt.charms.length === 1 ? '' : 's'} on a{' '}
-          {receipt.form}, {npr(receipt.total)}. Demo cart, nothing charged.
+          Added — {receipt.charms
+            ? `${receipt.charms.length} charm${receipt.charms.length === 1 ? '' : 's'} on a ${receipt.form}`
+            : receipt.name}
+          , {npr(receipt.total)}. Demo cart, nothing charged.
         </p>
       )}
     </div>

@@ -2,27 +2,27 @@
 version: 1
 slug: "src-app-jsx"
 primary_target: "src/App.jsx"
-related_targets: ["src/index.css"]
+related_targets: ["src/index.css","src/Landing.jsx"]
 ---
 
 # Surface: landing page + customizer (src/App.jsx)
 
-Scope: single-page demo. Landing (Persuade) with the customizer embedded as the hero mechanism, plus product shelves below. Visitor mode: Persuade.
+Scope: single-page demo shop. Landing (Persuade) with the charm builder one click away. Visitor mode: Persuade.
 
-Audience: gift/self shoppers on phones, evening, lamp light. Job: compose a bracelet or necklace with charms, see it live, know the price. Action: Build yours / Add to cart. Proof: the live room itself; illustrative prices labeled demo. Constraints: gold/luxe/ornate, maximalist, no real photos yet (swap-ready slots).
+Audience: gift/self shoppers on phones. Job: find a piece across the range (charm necklace, bracelet, earrings, brooch, keyring; belts; armcuffs), or compose a charm necklace/bracelet. Action: Shop / Build your own. Proof: real charm and chain photography, live rendered pieces, client promise strip. Constraints: client-pinned palette and type (see direction); photo slots for categories without photography.
 
-Chosen direction: The Furnishable Room (challenger cyworld-minihompy-room), translated to gold. Memorable moment: dropping a charm into the isometric jewelry room and watching it settle onto the piece while the ledger ticks.
+Chosen direction: client-pinned redesign, Oct 2026 (replaces The Furnishable Room). Memorable moment: the live bracelet swaying in its oval frame beside a maroon script headline.
 
 ## Direction contract
 
-THESIS: Your jewelry box is a tiny isometric room you furnish; charms are the furniture, the piece on the vanity is the profile. Refuses the cream-ground product grid with a hero photo.
+THESIS: A boutique counter on the palest beige: the brand speaks in maroon script, the goods are labelled in plain black. Refuses the old velvet/gilt maximalism.
 
-OWN-WORLD: Drenched oxblood velvet ground (#3b1020) with gilt (#d4a640 / #f3d98a) trim, blush champagne panels (#f6e4d6), jade (#2f6b57) and lapis (#2b3f8f) accents. Sticker-like panels with soft outlines and rounded 14px corners, gold hairline frames, ornate corner brackets. Display: Gloock. Body/labels: Nunito, compact rounded chips. Counters and mood marks as small honest chrome (visitors, charms placed, grams).
+OWN-WORLD: Ground #fbf8f2, tint #f5efe4, maroon #6e1f27, ink #15110f, gold only in the jewelry. Pinyon Script headings, EB Garamond italic body (maroon), League Spartan for products, prices, controls (black). Maroon pill CTAs with white text. Hairline frames, 14px radii.
 
-STORY: Visitor sees a furnished gold room with a half-built bracelet on the vanity and a charm tray beside it; understands "I decorate this"; believes the piece is theirs because they placed it; acts by tapping charms in, then Add to cart with the running price.
+STORY: Visitor sees the script promise and a live charm bracelet, reads the five promises (dispatch, waterproof, hypoallergenic, 18K PVD, safe payments), browses the seven pieces, taps Shop or opens the builder.
 
-FIRST VIEWPORT: Left third: shop name, headline "Your piece, your room." two lines Gloock, one sentence, primary button "Start decorating" (gilt) and secondary "See the shelves". Center: the isometric room (walls papered in gilt damask geometry, tiled floor, vanity with the live piece rendered as a chain of charm slots on a velvet bust/stand). Right column: panels: Today's piece (price, grams, charms placed), Visitors counter, Guest ledger with two notes. Below the room: the tray toolbar: Base · Chain · Charms · Colour. Primary action lives in the left column and repeats on the ledger panel as "Add to cart".
+FIRST VIEWPORT: Sticky masthead (nav left, logo centred, Shop right). Left half: two-line script headline, italic lede, Shop (maroon) + Build your own (line). Right half: live bracelet in an oval frame with name/price tag. Promise strip starts at the fold.
 
-FORM: The Furnishable Room, dealt challenger (competitive; won on user choice). Seed key 4bdd7adb. Signature interaction: click/tap a charm in the tray, it lands on the next slot of the piece with one soft settle (scale 1.15 to 1, 260ms exponential ease-out); drag to reorder slots; remove with a tiny tag. Motion grammar: settles only, no fades on data; ledger numbers step.
+FORM: Client-pinned brief (handwritten notes + promise-strip reference); no concept roll, pinned direction beats the roll. Seed key: none (pinned).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.

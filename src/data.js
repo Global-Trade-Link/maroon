@@ -75,6 +75,18 @@ export const ASSEMBLY = [
   { id: 'studio', name: 'Let the studio balance it', note: 'We keep your charms, space them evenly by weight.' },
 ]
 
+// The shop range. Only necklace and bracelet open the builder today; the rest
+// show a photo slot until product photography arrives.
+export const CATEGORIES = [
+  { id: 'charm-necklace', name: 'Charm Necklace', line: 'One fine chain, the charms you choose.', form: 'necklace' },
+  { id: 'charm-bracelet', name: 'Charm Bracelet', line: 'Nine links to fill, slowly or all at once.', form: 'bracelet' },
+  { id: 'charm-earrings', name: 'Charm Earrings', line: 'A small charm swinging at each ear.' },
+  { id: 'charm-brooch', name: 'Charm Brooch', line: 'Pinned to a lapel, a bag strap, a hat band.' },
+  { id: 'charm-keyring', name: 'Charm Keyring', line: 'Your charms, on every set of keys.' },
+  { id: 'belts', name: 'Belts', line: 'Gold chain that sits low at the waist.' },
+  { id: 'armcuffs', name: 'Armcuffs', line: 'Worn high on the arm, over a sleeve or without.' },
+]
+
 // Starting points on the landing page. Same renderer as the builder.
 export const PRESETS = [
   {
@@ -101,6 +113,33 @@ export const PRESETS = [
     charms: ['ballet'],
     line: 'One pair of shoes on the finest chain we cut.',
   },
+]
+
+// The "Build your own" row. Pieces without a form wait for photography.
+export const BUILDS = [
+  { id: 'b-bracelet', name: 'Charm Bracelet', form: 'bracelet', chain: 'cable', charms: ['mushroom', 'hamsa', 'ballet', 'hamsa', 'mushroom'] },
+  { id: 'b-necklace', name: 'Charm Necklace', form: 'necklace', chain: 'cable', charms: ['hamsa', 'mushroom', 'ballet'] },
+  { id: 'b-dainty', name: 'Dainty Charm Necklace', form: 'necklace', chain: 'fine', charms: ['ballet'] },
+  { id: 'b-paperclip', name: 'Paperclip Bracelet', form: 'bracelet', chain: 'paperclip', charms: ['mushroom', 'ballet', 'mushroom'] },
+  { id: 'b-bag', name: 'Bag Charm', from: 2400 },
+]
+
+// More ready-made arrangements for the bracelet shelf.
+export const BRACELETS = [
+  PRESETS[0],
+  PRESETS[1],
+  { id: 'pointe', name: 'Pointe Loop', form: 'bracelet', chain: 'cable', charms: ['ballet', 'ballet', 'ballet'] },
+  { id: 'eye', name: 'One Good Eye', form: 'bracelet', chain: 'fine', charms: ['hamsa'] },
+  { id: 'garden', name: 'Full Garden', form: 'bracelet', chain: 'paperclip', charms: ['mushroom', 'hamsa', 'ballet', 'hamsa', 'mushroom'] },
+]
+
+// Earrings and rings have no photography yet; names and prices are placeholders.
+export const EARRINGS_RINGS = [
+  { id: 'mush-drops', name: 'Mushroom Drop Earrings', price: 3400 },
+  { id: 'eye-huggies', name: 'Evil Eye Huggies', price: 2900 },
+  { id: 'pointe-studs', name: 'Pointe Shoe Studs', price: 2600 },
+  { id: 'charm-signet', name: 'Charm Signet Ring', price: 3800 },
+  { id: 'rolo-ring', name: 'Rolo Chain Ring', price: 2200 },
 ]
 
 // Nepal groups digits the Indian way: 1,20,000 rather than 120,000.
