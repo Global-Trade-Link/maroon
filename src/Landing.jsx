@@ -3,13 +3,18 @@ import Piece from './Piece.jsx'
 import { PromiseIcon } from './Icons.jsx'
 import { Crest, Flourish, Frame } from './Ornament.jsx'
 import {
+  ARMCUFFS,
+  BELTS,
+  BESTSELLERS,
   BRACELETS,
   BUILDS,
   CATEGORIES,
   CHAINS,
   CHARMS,
-  EARRINGS_RINGS,
+  CHARM_SIZES,
+  EARRINGS,
   PRESETS,
+  STYLED,
   chainOf,
   npr,
   priceOf,
@@ -24,25 +29,23 @@ const PROMISES = [
   ['payments', 'Safe payments'],
 ]
 
-// What the two buildable categories show in their frame.
-const SHOWCASE = {
-  necklace: { chain: 'fine', charms: ['hamsa', 'ballet', 'mushroom'] },
-  bracelet: { chain: 'cable', charms: ['mushroom', 'hamsa', 'ballet', 'hamsa', 'mushroom'] },
-}
+// Each buildable category shows its "Build your own" arrangement.
+const buildFor = (form) => BUILDS.find((b) => b.form === form)
 
 const SHOWS = [PRESETS[0], BRACELETS[4], BRACELETS[2], PRESETS[1]]
 
+// One face for each charm size; the builder opens on that size's tab.
+const SIZE_FACES = [['small', 'pearl'], ['medium', 'cherry'], ['big', 'blossom'], ['bulky', 'locket']]
 
-const BEST = [PRESETS[0], PRESETS[2], BRACELETS[2], PRESETS[1], BRACELETS[4]]
+// A spread across the four sizes for the charms shelf; the builder has the rest.
+const CHARM_PICKS = ['cherry', 'blossom', 'locket', 'letter', 'shell', 'porcheart', 'boot', 'pearl', 'spiral', 'bow']
 
-function Slot({ label = 'Photograph arriving' }) {
-  return (
-    <span className="photo-slot">
-      <img src="/logo-mark.png" alt="" width="64" height="50" />
-      <span>{label}</span>
-    </span>
-  )
-}
+// Charms scattered around the closing call, and strung along the footer.
+const CLOSE_CHARMS = ['cherry', 'starfish', 'blossom', 'letter']
+const GARLAND = ['pearl', 'cherry', 'shell', 'bow', 'blossom', 'letter', 'turtle', 'porcheart', 'starfish', 'tear', 'locket', 'cube', 'boot']
+
+// Chains you can choose; the fixed bases (hoops, keyring, pin) live in their own builders.
+const REAL_CHAINS = CHAINS.filter((c) => c.forms.includes('bracelet') || c.forms.includes('necklace'))
 
 function Shelf({ id, title, line, tint, children }) {
   return (
@@ -87,18 +90,14 @@ export default function Landing({ onOpen, onAdd, cart }) {
     const t = setTimeout(() => setShow((i) => (i + 1) % SHOWS.length), 5200)
     return () => clearTimeout(t)
   }, [show, hold])
-  const [soon, setSoon] = useState('')
 
-  useEffect(() => {
-    if (!soon) return
-    const t = setTimeout(() => setSoon(''), 3600)
-    return () => clearTimeout(t)
-  }, [soon])
-
-  const shop = (cat) =>
-    cat.form
-      ? onOpen({ form: cat.form, ...SHOWCASE[cat.form] })
-      : setSoon(`${cat.name} arrive with their photographs soon.`)
+  const photo = (p) => ({
+    media: <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} />,
+    name: p.name,
+    price: npr(p.price),
+    onMedia: p.form ? () => onOpen(p) : undefined,
+    onAdd: () => onAdd({ name: p.name, total: p.price }),
+  })
 
   const piece = (p) => ({
     media: <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms)} idle={false} />,
@@ -118,7 +117,9 @@ export default function Landing({ onOpen, onAdd, cart }) {
           <a href="#build">Build your own</a>
           <a href="#best">Best sellers</a>
           <a href="#bracelets">Bracelets</a>
-          <a href="#earrings">Earrings &amp; rings</a>
+          <a href="#earrings">Earrings</a>
+          <a href="#belts">Belts</a>
+          <a href="#armcuffs">Armcuffs</a>
         </nav>
         <a className="btn btn-sm" href="#build">
           Shop
@@ -139,9 +140,9 @@ export default function Landing({ onOpen, onAdd, cart }) {
               the way you meant it. Then we set it by hand and send it to you.
             </p>
             <div className="hero-acts">
-              <button className="btn" onClick={() => onOpen(hero)}>
+              <a className="btn" href="#build">
                 Build your own
-              </button>
+              </a>
               <a className="btn btn-line" href="#best">
                 Shop best sellers
               </a>
@@ -174,7 +175,7 @@ export default function Landing({ onOpen, onAdd, cart }) {
             >
               <span className="hero-oval" aria-hidden="true" />
               <Crest className="oval-crest" />
-              {CHARMS.map((c, i) => (
+              {CHARMS.slice(0, 3).map((c, i) => (
                 <img key={c.id} className={`hero-float hero-float-${'abc'[i]}`} src={c.img} alt="" aria-hidden="true" />
               ))}
               <Piece key={hero.id} form="bracelet" chain={hero.chain} charms={seedRack('bracelet', hero.charms)} />
@@ -201,18 +202,27 @@ export default function Landing({ onOpen, onAdd, cart }) {
       <section className="hero-story">
         <Crest className="crest-sm" />
         <h2>Every charm tells a piece of the story</h2>
+        <p className="hero-story-lede">Four sizes, from a dainty drop to a heavy locket. Tap one to start.</p>
         <ul>
-          {CHARMS.map((c) => (
-            <li key={c.id}>
-              <button
-                onClick={() => onOpen({ form: 'bracelet', chain: 'cable', charms: [c.id] })}
-                aria-label={`Start a bracelet with the ${c.name}`}
-              >
-                <img src={c.img} alt="" />
-              </button>
-              <span>{c.name}</span>
-            </li>
-          ))}
+          {SIZE_FACES.map(([size, id]) => {
+            const c = CHARMS.find((x) => x.id === id)
+            const z = CHARM_SIZES.find((x) => x.id === size)
+            const count = CHARMS.filter((x) => x.size === size).length
+            return (
+              <li key={size}>
+                <button
+                  onClick={() => onOpen({ form: 'bracelet', chain: 'link', charms: [id] })}
+                  aria-label={`Start a bracelet with ${z.name.toLowerCase()} charms`}
+                >
+                  <img src={c.img} alt="" />
+                </button>
+                <span>{z.name}</span>
+                <small>
+                  {count} charms · from {npr(Math.min(...CHARMS.filter((x) => x.size === size).map((x) => x.price)))}
+                </small>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
@@ -237,22 +247,16 @@ export default function Landing({ onOpen, onAdd, cart }) {
               <article key={b.id} className="build-card">
                 <button
                   className="build-media"
-                  onClick={() =>
-                    b.form ? onOpen(b) : setSoon(`${b.name}s arrive with their photographs soon.`)
-                  }
+                  onClick={() => onOpen(b)}
                   aria-label={`Build your own ${b.name}`}
                 >
                   <span className="build-badge" aria-hidden="true">
                     Build your own
                   </span>
-                  {b.form ? (
-                    <Piece form={b.form} chain={b.chain} charms={seedRack(b.form, b.charms)} idle={false} />
-                  ) : (
-                    <Slot />
-                  )}
+                  <Piece form={b.form} chain={b.chain} charms={seedRack(b.form, b.charms)} idle={false} />
                 </button>
                 <h3>{b.name}</h3>
-                <span className="price">From {npr(b.form ? chainOf(b.chain).price : b.from)}</span>
+                <span className="price">From {npr(chainOf(b.chain).price)}</span>
               </article>
             ))}
           </div>
@@ -260,8 +264,8 @@ export default function Landing({ onOpen, onAdd, cart }) {
       </section>
 
       <Shelf id="best" title="Best sellers" line="The arrangements people keep coming back for.">
-        {BEST.map((p) => (
-          <Item key={p.id} {...piece(p)} />
+        {BESTSELLERS.map((p) => (
+          <Item key={p.id} {...photo(p)} />
         ))}
       </Shelf>
 
@@ -271,10 +275,8 @@ export default function Landing({ onOpen, onAdd, cart }) {
         </h2>
         <p>Their charms, their story. Yours is next.</p>
         <div className="styled-row">
-          {[0, 1, 2, 3].map((i) => (
-            <span key={i} className="styled-slot">
-              <Slot label="Customer photograph arriving" />
-            </span>
+          {STYLED.map((p) => (
+            <img key={p.img} className="styled-photo" src={p.img} alt={p.alt} loading="lazy" />
           ))}
         </div>
       </section>
@@ -285,29 +287,42 @@ export default function Landing({ onOpen, onAdd, cart }) {
         ))}
       </Shelf>
 
-      <Shelf id="earrings" title="Earrings & rings" line="Small charms for the ear and the hand." tint>
-        {EARRINGS_RINGS.map((e) => (
-          <Item
-            key={e.id}
-            media={<Slot />}
-            name={e.name}
-            price={npr(e.price)}
-            onAdd={() => onAdd({ name: e.name, total: e.price })}
-          />
+      <Shelf id="earrings" title="Earrings" line="Handmade on the bench, or hoops you dress yourself." tint>
+        <Item
+          {...piece(buildFor('earrings'))}
+          name="Charm Hoops"
+          price={`From ${npr(chainOf('hoop').price)}`}
+          onAdd={() => onOpen(buildFor('earrings'))}
+          label="Build your own"
+        />
+        {EARRINGS.map((e) => (
+          <Item key={e.id} {...photo(e)} />
         ))}
       </Shelf>
 
-      <Shelf id="charms" title="Charms" line="Three are cast and in the studio right now. The rest of the season lands soon.">
-        {CHARMS.map((c) => (
+      <Shelf id="charms" title="Charms" line="Twenty-nine charms in four sizes, small to bulky. Every one is in the builder.">
+        {CHARM_PICKS.map((id) => CHARMS.find((c) => c.id === id)).map((c) => (
           <Item
             key={c.id}
             media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
             name={c.name}
             price={npr(c.price)}
-            onMedia={() => onOpen({ form: 'bracelet', chain: 'cable', charms: [c.id] })}
-            onAdd={() => onOpen({ form: 'bracelet', chain: 'cable', charms: [c.id] })}
+            onMedia={() => onOpen({ form: 'bracelet', chain: 'link', charms: [c.id] })}
+            onAdd={() => onOpen({ form: 'bracelet', chain: 'link', charms: [c.id] })}
             label="Add to a piece"
           />
+        ))}
+      </Shelf>
+
+      <Shelf id="belts" title="Belts" line="Western buckles, hearts, stars and leopard." tint>
+        {BELTS.map((p) => (
+          <Item key={p.id} {...photo(p)} />
+        ))}
+      </Shelf>
+
+      <Shelf id="armcuffs" title="Armcuffs" line="Wire-wrapped by hand around glass flowers and beads. Worn high on the arm.">
+        {ARMCUFFS.map((p) => (
+          <Item key={p.id} {...photo(p)} />
         ))}
       </Shelf>
 
@@ -318,24 +333,30 @@ export default function Landing({ onOpen, onAdd, cart }) {
         </header>
         <div className="range">
           {CATEGORIES.map((cat) => (
-            <article key={cat.id} className={`cat${cat.form ? ' cat-live' : ''}`}>
+            <article key={cat.id} className="cat">
               <figure className="cat-media">
                 {cat.form ? (
                   <Piece
                     form={cat.form}
-                    chain={SHOWCASE[cat.form].chain}
-                    charms={seedRack(cat.form, SHOWCASE[cat.form].charms)}
+                    chain={buildFor(cat.form).chain}
+                    charms={seedRack(cat.form, buildFor(cat.form).charms)}
                     idle={false}
                   />
                 ) : (
-                  <Slot />
+                  <img className="item-photo" src={cat.img} alt="" loading="lazy" style={{ '--focus': cat.focus }} />
                 )}
               </figure>
               <h3>{cat.name}</h3>
               <p>{cat.line}</p>
-              <button className="btn btn-sm" onClick={() => shop(cat)}>
-                {cat.form ? 'Shop & build' : 'Shop'}
-              </button>
+              {cat.form ? (
+                <button className="btn btn-sm" onClick={() => onOpen(buildFor(cat.form))}>
+                  Build your own
+                </button>
+              ) : (
+                <a className="btn btn-sm" href={cat.href}>
+                  Shop
+                </a>
+              )}
             </article>
           ))}
         </div>
@@ -344,10 +365,10 @@ export default function Landing({ onOpen, onAdd, cart }) {
       <section className="chapter" id="chains">
         <header className="chapter-head">
           <h2>The chains</h2>
-          <p>Three weights of gold, from barely there to wide and loud.</p>
+          <p>Five chains of gold, from barely there to wide and loud.</p>
         </header>
         <div className="chain-row">
-          {CHAINS.map((c) => (
+          {REAL_CHAINS.map((c) => (
             <article key={c.id} className="chain-card">
               <img src={c.img} alt={`${c.name}, ${c.gauge}`} loading="lazy" />
               <div className="chain-meta">
@@ -359,7 +380,7 @@ export default function Landing({ onOpen, onAdd, cart }) {
               <p>{c.note}</p>
               <button
                 className="btn btn-line btn-sm"
-                onClick={() => onOpen({ form: 'bracelet', chain: c.id, charms: [] })}
+                onClick={() => onOpen({ form: c.forms[0], chain: c.id, charms: [] })}
               >
                 Start with this chain
               </button>
@@ -369,37 +390,56 @@ export default function Landing({ onOpen, onAdd, cart }) {
       </section>
 
       <section className="close">
-        <Crest />
-        <h2>Start with an empty chain</h2>
-        <p>
-          Fill it slowly: a charm for a city, one for a person, one for the year you would rather
-          not repeat.
-        </p>
-        <button className="btn" onClick={() => onOpen({ form: 'bracelet', chain: 'cable', charms: [] })}>
-          Build your own
-        </button>
+        <figure className="close-photo close-photo-l">
+          <img src="/shop/best9.jpg" alt="Four charm bracelets boxed and ready to send" loading="lazy" />
+        </figure>
+        <div className="close-copy">
+          {CLOSE_CHARMS.map((id, i) => (
+            <img key={id} className={`close-charm close-charm-${i}`} src={`/charms/${id}.webp`} alt="" aria-hidden="true" loading="lazy" />
+          ))}
+          <Crest />
+          <h2>Start with an empty chain</h2>
+          <p>
+            Fill it slowly: a charm for a city, one for a person, one for the year you would rather
+            not repeat.
+          </p>
+          <button className="btn" onClick={() => onOpen({ form: 'bracelet', chain: 'link', charms: [] })}>
+            Build your own
+          </button>
+        </div>
+        <figure className="close-photo close-photo-r">
+          <img src="/shop/best4.jpg" alt="Seaside charm necklace, worn" loading="lazy" />
+        </figure>
       </section>
 
       <footer className="foot">
-        <nav aria-label="Footer">
-          <a href="#build">Build your own</a>
-          <a href="#best">Best sellers</a>
-          <a href="#bracelets">Bracelets</a>
-          <a href="#earrings">Earrings &amp; rings</a>
-          <a href="#charms">Charms</a>
-          <a href="#chains">Chains</a>
-        </nav>
-        <p>
-          Demo storefront. Charm and chain photography is real; prices, names and stock are
-          placeholders in Nepalese rupees and charge nothing.
-        </p>
+        <ul className="foot-garland" aria-hidden="true">
+          {GARLAND.map((id, i) => (
+            <li key={i} style={{ '--sway': `${(i % 4) * -0.6}s` }}>
+              <img src={`/charms/${id}.webp`} alt="" loading="lazy" />
+            </li>
+          ))}
+        </ul>
+        <div className="foot-inner">
+          <img className="foot-logo" src="/logo.png" alt="Maroon" width="96" height="96" loading="lazy" />
+          <p className="foot-line">Charms that carry a story. Set by hand, sent to you.</p>
+          <nav aria-label="Footer">
+            <a href="#build">Build your own</a>
+            <a href="#best">Best sellers</a>
+            <a href="#bracelets">Bracelets</a>
+            <a href="#earrings">Earrings</a>
+            <a href="#charms">Charms</a>
+            <a href="#belts">Belts</a>
+            <a href="#armcuffs">Armcuffs</a>
+            <a href="#chains">Chains</a>
+          </nav>
+          <p className="foot-vow">18K gold PVD · Waterproof · Hypoallergenic · Fast dispatch</p>
+          <p className="foot-note">
+            Demo storefront. All photography is real; prices, names and stock are placeholders in
+            Nepalese rupees and charge nothing.
+          </p>
+        </div>
       </footer>
-
-      {soon && (
-        <p className="receipt" role="status">
-          {soon}
-        </p>
-      )}
     </>
   )
 }

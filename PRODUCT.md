@@ -28,8 +28,8 @@ Landing page (shows the full product range) and a customizer surface. Real produ
 
 ## Capabilities and Constraints
 
-- Products (Oct 2026 range): charm necklace, charm bracelet, charm earrings, charm brooch, charm keyring, belts, armcuffs. The builder covers necklace and bracelet; the rest await photography.
-- Customizer (confirmed scope): pick base type (bracelet/necklace), pick chain/material, add/remove/reorder charms on a live preview, running price, add-to-cart summary.
+- Products (Oct 2026 range): charm necklace, charm bracelet, charm earrings, charm brooch, charm keyring, belts, armcuffs. Each charm piece has its own builder: bracelet, necklace, charm hoops, keyring, brooch. Belts, armcuffs and handmade earrings are photographed shelves.
+- Customizer (confirmed scope): one page per piece (no form toggle), pick chain/base, charms grouped in four sizes (small, medium, big, bulky), add/remove/reorder charms on a live preview, running price, add-to-cart summary.
 - Not in demo scope (undecided): engraving, sizing, gift packaging, payments, accounts.
 - Brand: Maroon (from the supplied logo: cream ground, maroon wordmark, wreath monogram).
 - Visual brief (client notes, Oct 2026): lightest beige background; product names simple and black; sub-headings and body maroon and cursive; CTAs maroon with white text.

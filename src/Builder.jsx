@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flourish, Frame } from './Ornament.jsx'
 import Piece, { VIEW, geometry } from './Piece.jsx'
-import { ASSEMBLY, CHAINS, CHARMS, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
+import { ASSEMBLY, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
 
 const emptyRack = (formId) => Array(formOf(formId).slots).fill(null)
 
 export default function Builder({ start, onBack, onAdd }) {
-  const [form, setForm] = useState(start.form)
-  const [chain, setChain] = useState(start.chain)
+  // One builder per form: a bracelet page never turns into a necklace page.
+  const form = start.form
+  const chains = chainsFor(form)
+  const [chain, setChain] = useState(() =>
+    chains.some((c) => c.id === start.chain) ? start.chain : chains[0].id,
+  )
+  const [size, setSize] = useState(() => charmOf(start.charms[0])?.size || 'small')
   const [assembly, setAssembly] = useState('exact')
   const [rack, setRack] = useState(() => seedRack(start.form, start.charms))
   const [drag, setDrag] = useState(null)
@@ -20,21 +25,12 @@ export default function Builder({ start, onBack, onAdd }) {
   const total = priceOf(chain, rack)
   const placed = rack.filter(Boolean).length
 
-  const swapForm = (next) => {
-    const moved = emptyRack(next)
-    rack.filter(Boolean).forEach((id, i) => {
-      if (i < moved.length) moved[i] = id
-    })
-    setForm(next)
-    setRack(moved)
-  }
-
   const countOf = (id) => rack.filter((x) => x === id).length
 
   const add = (id) => {
     const i = nextFreeSlot(rack)
     if (i === -1) {
-      setToast(`A ${formOf(form).name.toLowerCase()} holds ${rack.length} charms — take one off first.`)
+      setToast(`All ${rack.length} spots are taken — take a charm off first.`)
       return
     }
     const next = [...rack]
@@ -120,6 +116,7 @@ export default function Builder({ start, onBack, onAdd }) {
         <button className="bench-back" onClick={onBack}>
           ← All pieces
         </button>
+        <p className="bench-name">Build your own {formOf(form).name.toLowerCase()}</p>
         <a className="wordmark" href="#top" onClick={onBack} aria-label="Maroon, back to the shop">
           <img src="/logo-mark.png" alt="" width="104" height="80" />
         </a>
@@ -188,7 +185,9 @@ export default function Builder({ start, onBack, onAdd }) {
                   Drop here to remove
                 </>
               ) : (
-                'Add my design to cart'
+                <>
+                  Add <span className="cta-long">my design</span> to cart
+                </>
               )}
             </button>
           </div>
@@ -199,28 +198,16 @@ export default function Builder({ start, onBack, onAdd }) {
           <section>
             <h2 className="panel-title">
               <span className="panel-num" aria-label="Step 1">1</span>
-              Choose your chain
+              {chains.length > 1 ? 'Choose your chain' : 'Your base'}
             </h2>
             <p className="panel-lede">
-              Every design starts here. Pick a form, pick a chain, and it draws itself on the bench.
+              {chains.length > 1
+                ? 'Every design starts here. Pick a chain and it draws itself on the bench.'
+                : 'Every charm hangs from this. It comes with the piece.'}
             </p>
 
-            <div className="seg" role="group" aria-label="Form">
-              {['bracelet', 'necklace'].map((id) => (
-                <button
-                  key={id}
-                  className={form === id ? 'is-on' : ''}
-                  onClick={() => swapForm(id)}
-                  aria-pressed={form === id}
-                >
-                  {formOf(id).name}
-                  <small>{formOf(id).length}</small>
-                </button>
-              ))}
-            </div>
-
-            <div className="tiles">
-              {CHAINS.map((c) => (
+            <div className={`tiles${chains.length === 1 ? ' tiles-one' : ''}`}>
+              {chains.map((c) => (
                 <button
                   key={c.id}
                   className={`tile${chain === c.id ? ' is-on' : ''}`}
@@ -235,7 +222,7 @@ export default function Builder({ start, onBack, onAdd }) {
                 </button>
               ))}
             </div>
-            <p className="panel-note">{CHAINS.find((c) => c.id === chain).note}</p>
+            <p className="panel-note">{chainOf(chain).note}</p>
           </section>
 
           <section>
@@ -244,16 +231,43 @@ export default function Builder({ start, onBack, onAdd }) {
               Pick your charms &amp; placement
             </h2>
             <p className="panel-lede">
-              Charms land on the next free link. Drag any of them around the chain — or onto the
-              bar below to take one off.
+              Tap a charm to hang it on the next free spot. Drag charms around the piece, or onto
+              the bar to take one off.
             </p>
 
-            <div className="tiles tiles-charm">
-              {CHARMS.map((c) => {
+            <div className="sizes" role="tablist" aria-label="Charm size">
+              {CHARM_SIZES.map((z) => {
+                const n = rack.filter((id) => charmOf(id)?.size === z.id).length
+                return (
+                  <button
+                    key={z.id}
+                    role="tab"
+                    aria-selected={size === z.id}
+                    className={size === z.id ? 'is-on' : ''}
+                    onClick={() => setSize(z.id)}
+                  >
+                    {z.name}
+                    {n > 0 && <em>{n}</em>}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="panel-note sizes-note">{CHARM_SIZES.find((z) => z.id === size).line}</p>
+
+            <div className="tiles tiles-charm" role="tabpanel">
+              {CHARMS.filter((c) => c.size === size).map((c) => {
                 const n = countOf(c.id)
                 return (
                   <div key={c.id} className={`tile${n ? ' is-on' : ''}`}>
-                    <img src={c.img} alt="" height="96" loading="lazy" />
+                    <button
+                      className="tile-add"
+                      onClick={() => add(c.id)}
+                      disabled={placed >= rack.length}
+                      aria-label={`Add one ${c.name}`}
+                    >
+                      <img src={c.img} alt="" loading="lazy" />
+                      {n > 0 && <em className="tile-count">{n}</em>}
+                    </button>
                     <strong>{c.name}</strong>
                     <span className="tile-price">{npr(c.price)}</span>
                     <div className="step-count">
@@ -273,10 +287,6 @@ export default function Builder({ start, onBack, onAdd }) {
                 )
               })}
             </div>
-            <p className="panel-note">
-              Three charms are cast and in the studio right now. The rest of the season lands in
-              October.
-            </p>
           </section>
 
           <section>
@@ -310,8 +320,8 @@ export default function Builder({ start, onBack, onAdd }) {
                 <dd>{formOf(form).length}</dd>
               </div>
               <div>
-                <dt>{CHAINS.find((c) => c.id === chain).name}</dt>
-                <dd>{npr(CHAINS.find((c) => c.id === chain).price)}</dd>
+                <dt>{chainOf(chain).name}</dt>
+                <dd>{npr(chainOf(chain).price)}</dd>
               </div>
               {CHARMS.filter((c) => countOf(c.id)).map((c) => (
                 <div key={c.id}>
