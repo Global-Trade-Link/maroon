@@ -1,16 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Landing from './Landing.jsx'
 import Builder from './Builder.jsx'
-import { npr } from './data.js'
+import { PAGES, npr } from './data.js'
 
 export default function App() {
   const [start, setStart] = useState(null)
   const [cart, setCart] = useState([])
   const [receipt, setReceipt] = useState(null)
+  const [hash, setHash] = useState(window.location.hash)
+
+  // #/<page> is a shop page; any other hash is an anchor on the home page.
+  const page = hash.startsWith('#/') && PAGES[hash.slice(2)] ? hash.slice(2) : null
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [start])
+    const onHash = () => {
+      setHash(window.location.hash)
+      setStart(null)
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  // New page or builder: jump to the top, or to the anchor once it has rendered.
+  // Moving between sections of the home page glides instead.
+  const view = useRef(null)
+  useEffect(() => {
+    const now = start ? 'builder' : page || 'home'
+    const glide = view.current === now
+    view.current = now
+    const el = now === 'home' && hash.length > 1 && document.getElementById(hash.slice(1))
+    const bar = document.querySelector('.masthead')?.offsetHeight || 0
+    window.scrollTo({
+      top: el ? Math.max(0, el.getBoundingClientRect().top + window.scrollY - bar) : 0,
+      behavior: glide ? 'smooth' : 'instant',
+    })
+  }, [start, page, hash])
 
   useEffect(() => {
     if (!receipt) return
@@ -31,6 +55,7 @@ export default function App() {
         />
       ) : (
         <Landing
+          page={page}
           onOpen={setStart}
           onAdd={(item) => {
             setCart((c) => [...c, item])

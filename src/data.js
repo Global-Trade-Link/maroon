@@ -160,15 +160,23 @@ export const ASSEMBLY = [
   { id: 'studio', name: 'Let the studio balance it', note: 'We keep your charms, space them evenly by weight.' },
 ]
 
-// The shop range. Charm pieces open their own builder; the rest are photographed.
+// Shop pages, each at #/<id>.
+export const PAGES = {
+  bracelets: { name: 'Bracelets', line: 'Ready-made, still yours to move. Open any one and swap a charm.', img: '/shop/best8.jpg' },
+  earrings: { name: 'Earrings', line: 'Handmade on the bench, or hoops you dress yourself.', img: '/shop/best1.jpg' },
+  charms: { name: 'Charms', line: 'Twenty-nine charms in four sizes, small to bulky. Every one is in the builder.', img: '/shop/best9.jpg' },
+  belts: { name: 'Belts', line: 'Western buckles, hearts, stars and leopard.', img: '/shop/belt3.jpg' },
+  armcuffs: { name: 'Armcuffs', line: 'Wire-wrapped by hand around glass flowers and beads. Worn high on the arm.', img: '/shop/cuff1.jpg' },
+  chains: { name: 'Chains', line: 'Five chains of gold, from barely there to wide and loud.', img: '/shop/best4.jpg' },
+}
+
+// Shop by category on the home page; each one has its own page at #/<id>.
 export const CATEGORIES = [
-  { id: 'charm-bracelet', name: 'Charm Bracelet', line: 'Nine links to fill, slowly or all at once.', form: 'bracelet' },
-  { id: 'charm-necklace', name: 'Charm Necklace', line: 'One fine chain, the charms you choose.', form: 'necklace' },
-  { id: 'charm-earrings', name: 'Charm Hoops', line: 'A small charm swinging at each ear.', form: 'earrings' },
-  { id: 'charm-keyring', name: 'Charm Keyring', line: 'Your charms, on every set of keys.', form: 'keyring' },
-  { id: 'charm-brooch', name: 'Charm Brooch', line: 'Pinned to a lapel, a bag strap, a hat band.', form: 'brooch' },
-  { id: 'belts', name: 'Belts', line: 'Western buckles, hearts and leopard.', img: '/shop/belt3.jpg', href: '#belts' },
-  { id: 'armcuffs', name: 'Armcuffs', line: 'Wire-wrapped by hand, worn high on the arm.', img: '/shop/cuff1.jpg', focus: '50% 52%', href: '#armcuffs' },
+  { id: 'bracelets', name: 'Bracelets', img: '/shop/best8.jpg' },
+  { id: 'earrings', name: 'Earrings', img: '/shop/ear1.jpg' },
+  { id: 'charms', name: 'Charms', charm: '/charms/blossom.webp' },
+  { id: 'belts', name: 'Belts', img: '/shop/belt3.jpg' },
+  { id: 'armcuffs', name: 'Armcuffs', img: '/shop/cuff1.jpg', focus: '50% 52%' },
 ]
 
 // Starting points on the landing page. Same renderer as the builder.
@@ -201,8 +209,8 @@ export const PRESETS = [
 
 // The "Build your own" row: one card per builder.
 export const BUILDS = [
-  { id: 'b-bracelet', name: 'Charm Bracelet', form: 'bracelet', chain: 'link', charms: ['cherry', 'pearl', 'blossom', 'letter', 'bow'] },
   { id: 'b-necklace', name: 'Charm Necklace', form: 'necklace', chain: 'cable', charms: ['shell', 'starfish', 'porcheart'] },
+  { id: 'b-bracelet', name: 'Charm Bracelet', form: 'bracelet', chain: 'link', charms: ['cherry', 'pearl', 'blossom', 'letter', 'bow'] },
   { id: 'b-hoops', name: 'Charm Hoops', form: 'earrings', chain: 'hoop', charms: ['cube', 'cube'] },
   { id: 'b-keyring', name: 'Charm Keyring', form: 'keyring', chain: 'keyring', charms: ['locket', 'cherry', 'blossom'] },
   { id: 'b-brooch', name: 'Charm Brooch', form: 'brooch', chain: 'pin', charms: ['shell', 'porcheart', 'fish'] },
