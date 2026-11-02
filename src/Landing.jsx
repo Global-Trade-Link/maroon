@@ -48,7 +48,7 @@ function Garland({ className = '' }) {
   return (
     <ul className={`foot-garland ${className}`} aria-hidden="true">
       {GARLAND.map((id, i) => (
-        <li key={i} style={{ '--sway': `${(i % 4) * -0.6}s` }}>
+        <li key={i} data-charm={id} style={{ '--sway': `${(i % 4) * -0.6}s` }}>
           <img src={`/charms/${id}.webp`} alt="" loading="lazy" />
         </li>
       ))}
@@ -244,9 +244,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
               the way you meant it. Then we set it by hand and send it to you.
             </p>
             <div className="hero-acts">
-              <a className="btn" href="#build">
+              <button className="btn" onClick={() => onOpen(BUILDS[0])}>
                 Build your own
-              </a>
+              </button>
               <a className="btn btn-line" href="#best">
                 Shop best sellers
               </a>
@@ -277,8 +277,12 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           >
             <button
               className="hero-open"
-              onClick={() => (hero.form ? onOpen(hero) : (window.location.hash = '#best'))}
-              aria-label={hero.form ? `Open the builder with ${hero.name}` : `See ${hero.name} in Best sellers`}
+              onClick={() =>
+                window.location.hash === '#best'
+                  ? document.getElementById('best').scrollIntoView({ behavior: 'smooth' })
+                  : (window.location.hash = '#best')
+              }
+              aria-label={`See ${hero.name} in Best sellers`}
             >
               <span className="hero-oval" aria-hidden="true">
                 <img key={hero.id} className="hero-photo" src={hero.img} alt="" />

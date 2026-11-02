@@ -1554,3 +1554,5 @@ button.tile:hover img { box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 6px var(
 @media (min-width: 1081px) {
   .build .build-row { gap: clamp(40px, 4.4vw, 72px); }
 }
+/* The love letter's loop sits near its right edge (~79% across); slide it so the loop meets the string. */
+.foot-garland [data-charm='letter'] img { transform: translateX(-29%); }
