@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flourish, Frame } from './Ornament.jsx'
 import Piece, { VIEW, geometry } from './Piece.jsx'
-import { ASSEMBLY, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
+import { Footer, Masthead } from './Landing.jsx'
+import { ASSEMBLY, BUILDS, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
 
-export default function Builder({ start, onBack, onAdd }) {
+export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
   // One builder per form: a bracelet page never turns into a necklace page.
   const form = start.form
   const chains = chainsFor(form)
@@ -183,15 +184,28 @@ export default function Builder({ start, onBack, onAdd }) {
 
   return (
     <div className={`builder${drag ? ' is-dragging' : ''}`}>
-      <header className="masthead">
+      <Masthead cart={cart} onNav={onBack} />
+      <div className="bench-head">
         <button className="bench-back" onClick={onBack}>
           ← All pieces
         </button>
         <p className="bench-name">Build your own {formOf(form).name.toLowerCase()}</p>
-        <a className="wordmark" href="#top" onClick={onBack} aria-label="Maroon, back to the shop">
-          <img src="/logo-mark.png" alt="" width="104" height="80" />
-        </a>
-      </header>
+      </div>
+      <nav className="bench-forms" aria-label="Choose what you are building">
+        {BUILDS.map((b) => (
+          <button
+            key={b.id}
+            className={b.form === form ? 'is-on' : ''}
+            aria-pressed={b.form === form}
+            onClick={() => b.form !== form && onSwitch(placed ? { ...b, charms: rack.filter(Boolean) } : b)}
+          >
+            <span className="bench-form-media">
+              <Piece form={b.form} chain={b.chain} charms={seedRack(b.form, b.charms, b.chain)} idle={false} />
+            </span>
+            {b.name.replace('Charm ', '')}
+          </button>
+        ))}
+      </nav>
       <div className="builder-grid">
         <div className="bench">
           <Frame className="bench-frame">
@@ -265,6 +279,30 @@ export default function Builder({ start, onBack, onAdd }) {
             </button>
           </div>
           {toast && <p className="bench-toast">{toast}</p>}
+
+          <div className="bench-extra">
+            <p className="bench-on-title">
+              On your {formOf(form).name.toLowerCase()}
+              <span>
+                {placed} of {rack.length} spot{rack.length === 1 ? '' : 's'}
+              </span>
+            </p>
+            {placed ? (
+              <ul className="bench-on">
+                {CHARMS.filter((c) => countOf(c.id)).map((c) => (
+                  <li key={c.id}>
+                    <button onClick={() => drop(c.id)} aria-label={`Remove one ${c.name}`} title="Take one off">
+                      <img src={c.img} alt="" />
+                      {countOf(c.id) > 1 && <em>{countOf(c.id)}</em>}
+                    </button>
+                    <span>{c.name}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="bench-on-empty">Nothing hung yet. Tap a charm on the right to start.</p>
+            )}
+          </div>
         </div>
 
         <div className="panel">
@@ -410,10 +448,10 @@ export default function Builder({ start, onBack, onAdd }) {
                 <dd>{npr(total)}</dd>
               </div>
             </dl>
-            <p className="panel-note">Demo pricing. Nothing here charges a card.</p>
           </section>
         </div>
       </div>
+      <Footer onNav={onBack} />
     </div>
   )
 }

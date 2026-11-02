@@ -48,7 +48,10 @@ export default function App() {
     <div className="shell">
       {start ? (
         <Builder
+          key={start.form}
           start={start}
+          cart={cart.length}
+          onSwitch={setStart}
           onBack={() => setStart(null)}
           onAdd={(design) => {
             setCart((c) => [...c, design])

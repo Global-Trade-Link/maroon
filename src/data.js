@@ -287,6 +287,14 @@ export const STYLED = [
 ]
 
 // Nepal groups digits the Indian way: 1,20,000 rather than 120,000.
+export const PROMISES = [
+  ['dispatch', 'Fast dispatch and express delivery'],
+  ['waterproof', 'Waterproof'],
+  ['hypoallergenic', 'Hypoallergenic'],
+  ['gold', '18K gold PVD plated'],
+  ['payments', 'Safe payments'],
+]
+
 export const npr = (n) => `Rs ${n.toLocaleString('en-IN')}`
 
 export const chainOf = (id) => CHAINS.find((c) => c.id === id)

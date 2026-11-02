@@ -10,6 +10,7 @@ import {
   BUILDS,
   CATEGORIES,
   PAGES,
+  PROMISES,
   CHAINS,
   CHARMS,
   CHARM_SIZES,
@@ -21,13 +22,6 @@ import {
   seedRack,
 } from './data.js'
 
-const PROMISES = [
-  ['dispatch', 'Fast dispatch and express delivery'],
-  ['waterproof', 'Waterproof'],
-  ['hypoallergenic', 'Hypoallergenic'],
-  ['gold', '18K gold PVD plated'],
-  ['payments', 'Safe payments'],
-]
 
 // Each buildable category shows its "Build your own" arrangement.
 const buildFor = (form) => BUILDS.find((b) => b.form === form)
@@ -102,22 +96,6 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
   const [hold, setHold] = useState(false) // pointer or focus is on the piece
   const [paused, setPaused] = useState(false) // visitor stopped the slideshow
   const [picked, setPicked] = useState(false) // visitor chose a piece; only then announce it
-  const [menu, setMenu] = useState(false) // mobile menu panel
-  const [carry, setCarry] = useState(null) // charm picked on the Charms page, waiting for a piece
-
-  // Mobile menu closes on page change, Escape, or a tap outside the masthead.
-  useEffect(() => setMenu(false), [page])
-  useEffect(() => {
-    if (!menu) return
-    const onKey = (e) => e.key === 'Escape' && setMenu(false)
-    const onDown = (e) => !e.target.closest('.masthead') && setMenu(false)
-    document.addEventListener('keydown', onKey)
-    document.addEventListener('pointerdown', onDown)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.removeEventListener('pointerdown', onDown)
-    }
-  }, [menu])
   const hero = SHOWS[show]
   const [onHero, setOnHero] = useState(true)
 
@@ -196,10 +174,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
               media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
               name={c.name}
               price={npr(c.price)}
-              onAdd={() => {
-                setCarry(c.id)
-                window.location.hash = '#build'
-              }}
+              onAdd={() => onOpen({ ...BUILDS[0], charms: [c.id] })}
               label="Add to a piece"
             />
           ))}
@@ -227,36 +202,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
 
   return (
     <>
-      <header className={`masthead${onHero ? ' is-dark' : ''}`}>
-        <button
-          className="menu-toggle"
-          aria-expanded={menu}
-          aria-controls="site-nav"
-          aria-label={menu ? 'Close menu' : 'Open menu'}
-          onClick={() => setMenu((v) => !v)}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path className="menu-line menu-line-a" d="M4 8h16" />
-            <path className="menu-line menu-line-b" d="M4 16h16" />
-          </svg>
-        </button>
-        <a className="wordmark" href="#top" aria-label="Maroon, back to top">
-          <img src="/logo-mark.png" alt="" width="104" height="80" />
-        </a>
-        <nav id="site-nav" aria-label="Sections" data-open={menu} onClick={(e) => e.target.closest('a') && setMenu(false)}>
-          <a href="#build">Build your own</a>
-          <a href="#best">Best sellers</a>
-          {NAV_PAGES.map((id) => (
-            <a key={id} href={`#/${id}`} aria-current={page === id ? 'page' : undefined}>
-              {PAGES[id].name}
-            </a>
-          ))}
-        </nav>
-        <a className="btn btn-sm" href="#build">
-          Shop
-          {cart > 0 && <em aria-label={`${cart} in bag`}>{cart}</em>}
-        </a>
-      </header>
+      <Masthead page={page} cart={cart} dark={onHero} />
 
       {page ? (
         <main className="page">
@@ -412,26 +358,14 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           <Crest className="crest-sm" />
           <header className="build-head">
             <h2>Build your own</h2>
-            {carry ? (
-              <p>
-                Choose a piece for your {CHARMS.find((c) => c.id === carry).name}.{' '}
-                <button className="build-carry-off" onClick={() => setCarry(null)}>
-                  Start without it
-                </button>
-              </p>
-            ) : (
-              <p>Choose the piece, then hang every charm yourself. The price moves as you do.</p>
-            )}
+            <p>Choose the piece, then hang every charm yourself. The price moves as you do.</p>
           </header>
           <div className="build-row">
-            {BUILDS.map((b) => carry ? { ...b, charms: [carry] } : b).map((b) => (
+            {BUILDS.map((b) => (
               <article key={b.id} className="build-card">
                 <button
                   className="build-media"
-                  onClick={() => {
-                    setCarry(null)
-                    onOpen(b)
-                  }}
+                  onClick={() => onOpen(b)}
                   aria-label={`Build your own ${b.name}`}
                 >
                   <span className="build-badge" aria-hidden="true">
@@ -444,6 +378,11 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
               </article>
             ))}
           </div>
+          <ol className="build-steps">
+            <li><span>1</span>Pick the piece &amp; its chain</li>
+            <li><span>2</span>Hang your charms where you like</li>
+            <li><span>3</span>We solder it by hand and send it</li>
+          </ol>
         </Frame>
       </section>
 
@@ -514,27 +453,84 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       </>
       )}
 
-      <footer className="foot">
-        <Garland />
-        <div className="foot-inner">
-          <img className="foot-logo" src="/logo.png" alt="Maroon" width="96" height="96" loading="lazy" />
-          <p className="foot-line">Charms that carry a story. Set by hand, sent to you.</p>
-          <nav aria-label="Footer">
-            <a href="#build">Build your own</a>
-            <a href="#best">Best sellers</a>
-            {Object.entries(PAGES).map(([id, pg]) => (
-              <a key={id} href={`#/${id}`}>
-                {pg.name}
-              </a>
-            ))}
-          </nav>
-          <p className="foot-vow">18K gold PVD · Waterproof · Hypoallergenic · Fast dispatch</p>
-          <p className="foot-note">
-            Demo storefront. All photography is real; prices, names and stock are placeholders in
-            Nepalese rupees and charge nothing.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </>
+  )
+}
+
+// Shared with the builder; onNav lets the builder close before a footer link jumps.
+export function Footer({ onNav }) {
+  return (
+    <footer className="foot" onClick={(e) => e.target.closest('a') && onNav?.()}>
+      <Garland />
+      <div className="foot-inner">
+        <img className="foot-logo" src="/logo.png" alt="Maroon" width="96" height="96" loading="lazy" />
+        <p className="foot-line">Charms that carry a story. Set by hand, sent to you.</p>
+        <nav aria-label="Footer">
+          <a href="#build">Build your own</a>
+          <a href="#best">Best sellers</a>
+          {Object.entries(PAGES).map(([id, pg]) => (
+            <a key={id} href={`#/${id}`}>
+              {pg.name}
+            </a>
+          ))}
+        </nav>
+        <p className="foot-vow">18K gold PVD · Waterproof · Hypoallergenic · Fast dispatch</p>
+        <p className="foot-note">
+          Demo storefront. All photography is real; prices, names and stock are placeholders in
+          Nepalese rupees and charge nothing.
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+// The site navbar, shared with the builder; onNav lets the builder close before a link jumps.
+export function Masthead({ page, cart, dark = false, onNav }) {
+  const [menu, setMenu] = useState(false) // mobile menu panel
+
+  // Mobile menu closes on page change, Escape, or a tap outside the masthead.
+  useEffect(() => setMenu(false), [page])
+  useEffect(() => {
+    if (!menu) return
+    const onKey = (e) => e.key === 'Escape' && setMenu(false)
+    const onDown = (e) => !e.target.closest('.masthead') && setMenu(false)
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onDown)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onDown)
+    }
+  }, [menu])
+
+  return (
+    <header className={`masthead${dark ? ' is-dark' : ''}`} onClick={(e) => e.target.closest('a') && onNav?.()}>
+      <button
+        className="menu-toggle"
+        aria-expanded={menu}
+        aria-controls="site-nav"
+        aria-label={menu ? 'Close menu' : 'Open menu'}
+        onClick={() => setMenu((v) => !v)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path className="menu-line menu-line-a" d="M4 8h16" />
+          <path className="menu-line menu-line-b" d="M4 16h16" />
+        </svg>
+      </button>
+      <a className="wordmark" href="#top" aria-label="Maroon, back to top">
+        <img src="/logo-mark.png" alt="" width="104" height="80" />
+      </a>
+      <nav id="site-nav" aria-label="Sections" data-open={menu} onClick={(e) => e.target.closest('a') && setMenu(false)}>
+        {NAV_PAGES.map((id) => (
+          <a key={id} href={`#/${id}`} aria-current={page === id ? 'page' : undefined}>
+            {PAGES[id].name}
+          </a>
+        ))}
+      </nav>
+      <a className="btn btn-sm" href="#build">
+        Shop
+        {cart > 0 && <em aria-label={`${cart} in bag`}>{cart}</em>}
+      </a>
+    </header>
   )
 }
