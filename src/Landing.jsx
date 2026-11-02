@@ -462,10 +462,54 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
   )
 }
 
+// Footer contact links, shown as icons only (the label is for screen readers).
+const SOCIAL = [
+  {
+    id: 'instagram',
+    label: 'Maroon on Instagram',
+    href: 'https://www.instagram.com/maroon.np/',
+    icon: (
+      <>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" />
+      </>
+    ),
+  },
+  {
+    id: 'facebook',
+    label: 'Maroon on Facebook',
+    href: 'https://www.facebook.com/profile.php?id=61571807237940',
+    icon: <path d="M14 21v-7.5h2.6l.4-3H14V8.6c0-.9.3-1.5 1.5-1.5H17V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.8 1.4-3.8 3.9v2.3H8.5v3H11V21" />,
+  },
+  {
+    id: 'whatsapp',
+    label: 'Message Maroon on WhatsApp',
+    href: 'https://wa.me/9779863911545',
+    icon: (
+      <>
+        <path d="M4 20l1.2-4.1A8 8 0 1 1 8.3 19z" />
+        <path d="M9 8.5c0 3.4 3 6.5 6.5 6.5l1-1.4-2-1-1 .8c-1-.5-1.9-1.4-2.4-2.4l.8-1-1-2z" />
+      </>
+    ),
+  },
+  {
+    id: 'email',
+    label: 'Email Maroon at maroonp.business@gmail.com',
+    href: 'mailto:maroonp.business@gmail.com',
+    icon: (
+      <>
+        <rect x="3" y="5.5" width="18" height="13" rx="2" />
+        <path d="M3.5 7l8.5 6.5L20.5 7" />
+      </>
+    ),
+  },
+]
+
 // Shared with the builder; onNav lets the builder close before a footer link jumps.
 export function Footer({ onNav }) {
   return (
-    <footer className="foot" onClick={(e) => e.target.closest('a') && onNav?.()}>
+    <footer className="foot" onClick={(e) => e.target.closest('a[href^="#"]') && onNav?.()}>
       <Garland />
       <div className="foot-inner">
         <img className="foot-logo" src="/logo.png" alt="Maroon" width="96" height="96" loading="lazy" />
@@ -479,6 +523,15 @@ export function Footer({ onNav }) {
             </a>
           ))}
         </nav>
+        <ul className="foot-social" aria-label="Contact Maroon">
+          {SOCIAL.map((x) => (
+            <li key={x.id}>
+              <a href={x.href} target={x.id === 'email' ? undefined : '_blank'} rel="noopener noreferrer" aria-label={x.label} title={x.label}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">{x.icon}</svg>
+              </a>
+            </li>
+          ))}
+        </ul>
         <p className="foot-vow">18K gold PVD · Waterproof · Hypoallergenic · Fast dispatch</p>
         <p className="foot-note">
           Demo storefront. All photography is real; prices, names and stock are placeholders in

@@ -1556,3 +1556,19 @@ button.tile:hover img { box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 6px var(
 }
 /* The love letter's loop sits near its right edge (~79% across); slide it so the loop meets the string. */
 .foot-garland [data-charm='letter'] img { transform: translateX(-29%); }
+
+/* Footer contact row */
+.foot-social { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.foot-social a {
+  display: inline-flex; align-items: center; gap: 9px;
+  color: var(--cream); text-decoration: none;
+  font-family: var(--sans); font-style: normal; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.04em;
+}
+.foot-social svg {
+  width: 42px; height: 42px; padding: 10px; border-radius: 50%;
+  border: 1px solid rgba(213, 171, 60, 0.55); color: var(--gold);
+  fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out);
+}
+.foot-social a:hover { color: #fff; }
+.foot-social a:hover svg { background: var(--gold); color: var(--maroon-deep); }
