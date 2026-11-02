@@ -9,8 +9,10 @@ export default function App() {
   const [receipt, setReceipt] = useState(null)
   const [hash, setHash] = useState(window.location.hash)
 
-  // #/<page> is a shop page; any other hash is an anchor on the home page.
-  const page = hash.startsWith('#/') && PAGES[hash.slice(2)] ? hash.slice(2) : null
+  // #/<page> is a shop page, #/<page>/<id> jumps to a part of it; any other hash
+  // is an anchor on the home page.
+  const [path, part] = hash.startsWith('#/') ? hash.slice(2).split('/') : []
+  const page = PAGES[path] ? path : null
 
   useEffect(() => {
     const onHash = () => {
@@ -28,7 +30,7 @@ export default function App() {
     const now = start ? 'builder' : page || 'home'
     const glide = view.current === now
     view.current = now
-    const el = now === 'home' && hash.length > 1 && document.getElementById(hash.slice(1))
+    const el = now === 'home' ? hash.length > 1 && document.getElementById(hash.slice(1)) : part && document.getElementById(part)
     const bar = document.querySelector('.masthead')?.offsetHeight || 0
     window.scrollTo({
       top: el ? Math.max(0, el.getBoundingClientRect().top + window.scrollY - bar) : 0,

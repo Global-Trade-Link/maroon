@@ -14,7 +14,6 @@ import {
   CHARMS,
   CHARM_SIZES,
   EARRINGS,
-  PRESETS,
   STYLED,
   chainOf,
   npr,
@@ -33,7 +32,11 @@ const PROMISES = [
 // Each buildable category shows its "Build your own" arrangement.
 const buildFor = (form) => BUILDS.find((b) => b.form === form)
 
-const SHOWS = [PRESETS[0], BRACELETS[4], BRACELETS[2], PRESETS[1]]
+// The hero turns through photographed best sellers (they stay on the Best sellers shelf too).
+const SHOWS = ['best-seaside', 'best-citrus', 'best-pearl-hoops'].map((id) => BESTSELLERS.find((p) => p.id === id))
+
+// Charms drifting round the hero oval: red, blue-and-white and pink read well on maroon.
+const HERO_FLOATS = ['cherry', 'porcheart', 'blossom']
 
 // One face for each charm size; the builder opens on that size's tab.
 const SIZE_FACES = [['small', 'pearl'], ['medium', 'cherry'], ['big', 'blossom'], ['bulky', 'locket']]
@@ -100,6 +103,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
   const [paused, setPaused] = useState(false) // visitor stopped the slideshow
   const [picked, setPicked] = useState(false) // visitor chose a piece; only then announce it
   const [menu, setMenu] = useState(false) // mobile menu panel
+  const [carry, setCarry] = useState(null) // charm picked on the Charms page, waiting for a piece
 
   // Mobile menu closes on page change, Escape, or a tap outside the masthead.
   useEffect(() => setMenu(false), [page])
@@ -141,7 +145,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
     }
   }, [page])
 
-  // The hero turns through the bracelets. Hover or focus holds it; a touch, a dot,
+  // The hero turns through the best sellers. Hover or focus holds it; a touch, a dot,
   // or the pause button stops it for good (WCAG 2.2.2).
   useEffect(() => {
     if (hold || paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -158,7 +162,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
   })
 
   const piece = (p) => ({
-    media: <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms)} idle={false} />,
+    media: <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} />,
     name: p.name,
     price: npr(priceOf(p.chain, p.charms)),
     onMedia: () => onOpen(p),
@@ -179,16 +183,28 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       />,
       ...EARRINGS.map((e) => <Item key={e.id} {...photo(e)} />),
     ],
-    charms: CHARMS.map((c) => (
-      <Item
-        key={c.id}
-        media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
-        name={c.name}
-        price={npr(c.price)}
-        onMedia={() => onOpen({ form: 'bracelet', chain: 'link', charms: [c.id] })}
-        onAdd={() => onOpen({ form: 'bracelet', chain: 'link', charms: [c.id] })}
-        label="Add to a piece"
-      />
+    charms: CHARM_SIZES.map((z) => (
+      <section key={z.id} id={z.id} className="charm-size">
+        <header className="charm-size-head">
+          <h2>{z.name}</h2>
+          <p>{z.line}</p>
+        </header>
+        <div className="shelf-row">
+          {CHARMS.filter((c) => c.size === z.id).map((c) => (
+            <Item
+              key={c.id}
+              media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
+              name={c.name}
+              price={npr(c.price)}
+              onAdd={() => {
+                setCarry(c.id)
+                window.location.hash = '#build'
+              }}
+              label="Add to a piece"
+            />
+          ))}
+        </div>
+      </section>
     )),
     belts: BELTS.map((p) => <Item key={p.id} {...photo(p)} />),
     armcuffs: ARMCUFFS.map((p) => <Item key={p.id} {...photo(p)} />),
@@ -261,9 +277,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           </section>
           <section className="shelf">
             <p className="page-count">
-              {pages[page].length} {page === 'chains' ? 'chains' : 'pieces'}
+              {page === 'charms' ? `${CHARMS.length} charms` : `${pages[page].length} ${page === 'chains' ? 'chains' : 'pieces'}`}
             </p>
-            <div className={page === 'chains' ? 'chain-row' : 'shelf-row'}>{pages[page]}</div>
+            {page === 'charms' ? pages.charms : <div className={page === 'chains' ? 'chain-row' : 'shelf-row'}>{pages[page]}</div>}
           </section>
         </main>
       ) : (
@@ -315,18 +331,19 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           >
             <button
               className="hero-open"
-              onClick={() => onOpen(hero)}
-              aria-label={`Open the builder with ${hero.name}`}
+              onClick={() => (hero.form ? onOpen(hero) : (window.location.hash = '#best'))}
+              aria-label={hero.form ? `Open the builder with ${hero.name}` : `See ${hero.name} in Best sellers`}
             >
-              <span className="hero-oval" aria-hidden="true" />
-              {CHARMS.slice(0, 3).map((c, i) => (
-                <img key={c.id} className={`hero-float hero-float-${'abc'[i]}`} src={c.img} alt="" aria-hidden="true" />
+              <span className="hero-oval" aria-hidden="true">
+                <img key={hero.id} className="hero-photo" src={hero.img} alt="" />
+              </span>
+              {HERO_FLOATS.map((id, i) => (
+                <img key={id} className={`hero-float hero-float-${'abc'[i]}`} src={CHARMS.find((c) => c.id === id).img} alt="" aria-hidden="true" />
               ))}
-              <Piece key={hero.id} form="bracelet" chain={hero.chain} charms={seedRack('bracelet', hero.charms)} />
             </button>
             <div className="hero-tag" aria-live={picked ? 'polite' : 'off'}>
               <b>{hero.name}</b>
-              <span>{npr(priceOf(hero.chain, hero.charms))}</span>
+              <span>{npr(hero.price)}</span>
               <span className="hero-dots">
                 {SHOWS.map((p, i) => (
                   <button
@@ -358,8 +375,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
 
       <section className="hero-story">
         <Crest className="crest-sm" />
-        <h2>Every charm tells a piece of the story</h2>
-        <p className="hero-story-lede">Four sizes, from a dainty drop to a heavy locket. Tap one to start.</p>
+        <h2>The Charm Bar</h2>
+        <p className="hero-story-sub">Every charm tells a piece of the story</p>
+        <p className="hero-story-lede">Four sizes, from a dainty drop to a heavy locket. Tap one to see them all.</p>
         <ul>
           {SIZE_FACES.map(([size, id]) => {
             const c = CHARMS.find((x) => x.id === id)
@@ -367,12 +385,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
             const count = CHARMS.filter((x) => x.size === size).length
             return (
               <li key={size}>
-                <button
-                  onClick={() => onOpen({ form: 'necklace', chain: 'cable', charms: [id] })}
-                  aria-label={`Start a necklace with ${z.name.toLowerCase()} charms`}
-                >
+                <a href={`#/charms/${size}`} aria-label={`See the ${z.name.toLowerCase()} charms`}>
                   <img src={c.img} alt="" />
-                </button>
+                </a>
                 <span>{z.name}</span>
                 <small>
                   {count} charms · from {npr(Math.min(...CHARMS.filter((x) => x.size === size).map((x) => x.price)))}
@@ -397,20 +412,32 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           <Crest className="crest-sm" />
           <header className="build-head">
             <h2>Build your own</h2>
-            <p>Choose the piece, then hang every charm yourself. The price moves as you do.</p>
+            {carry ? (
+              <p>
+                Choose a piece for your {CHARMS.find((c) => c.id === carry).name}.{' '}
+                <button className="build-carry-off" onClick={() => setCarry(null)}>
+                  Start without it
+                </button>
+              </p>
+            ) : (
+              <p>Choose the piece, then hang every charm yourself. The price moves as you do.</p>
+            )}
           </header>
           <div className="build-row">
-            {BUILDS.map((b) => (
+            {BUILDS.map((b) => carry ? { ...b, charms: [carry] } : b).map((b) => (
               <article key={b.id} className="build-card">
                 <button
                   className="build-media"
-                  onClick={() => onOpen(b)}
+                  onClick={() => {
+                    setCarry(null)
+                    onOpen(b)
+                  }}
                   aria-label={`Build your own ${b.name}`}
                 >
                   <span className="build-badge" aria-hidden="true">
                     Build your own
                   </span>
-                  <Piece form={b.form} chain={b.chain} charms={seedRack(b.form, b.charms)} idle={false} />
+                  <Piece form={b.form} chain={b.chain} charms={seedRack(b.form, b.charms, b.chain)} idle={false} />
                 </button>
                 <h3>{b.name}</h3>
                 <span className="price">From {npr(chainOf(b.chain).price)}</span>

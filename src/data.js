@@ -24,7 +24,9 @@ export const CHAINS = [
     linkLen: 12,
     wire: 2.6,
     forms: ['necklace'],
-    note: 'Barely there. Lets one charm carry the whole piece.',
+    // Worn as a pendant: the fine chain only ever carries one charm.
+    slots: 1,
+    note: 'Barely there. Worn as a pendant: one charm carries the whole piece.',
   },
   {
     id: 'cable',
@@ -126,7 +128,7 @@ export const CHARM_SIZES = [
 export const CHARMS = [
   { id: 'mushroom', size: 'medium', name: 'Red Mushroom', price: 2900, img: '/charms/mushroom.png', w: 64, h: 98, story: 'Hand-enamelled cap, polished gold stem.' },
   { id: 'hamsa', size: 'medium', name: 'Evil Palm', price: 2500, img: '/charms/hamsa.png', w: 48, h: 96, story: 'Cast hamsa, crystal set eye. Worn against the bad look.' },
-  { id: 'ballet', size: 'big', name: 'Dance Shoe', price: 3200, img: '/charms/ballet.png', w: 78, h: 53, story: 'A pair of pointe shoes, ribbons crossed.' },
+  { id: 'ballet', size: 'big', name: 'Ballet Shoes', price: 3200, img: '/charms/ballet.png', w: 78, h: 53, story: 'A pair of pointe shoes, ribbons crossed.' },
   { id: 'bar', size: 'small', name: 'Emerald Baguette', price: 1200, img: '/charms/bar.webp', w: 20, h: 62, story: 'Three square stones stepping from clear to deep green.' },
   { id: 'tear', size: 'small', name: 'Pink Teardrop', price: 1200, img: '/charms/tear.webp', w: 28, h: 62, story: 'A pink stone in a ring of tiny clear ones.' },
   { id: 'pearl', size: 'small', name: 'Baroque Pearl', price: 1200, img: '/charms/pearl.webp', w: 38, h: 62, story: 'Lumpy, glossy, never two the same.' },
@@ -306,8 +308,11 @@ export function nextFreeSlot(rack) {
   return order.find((i) => !rack[i]) ?? -1
 }
 
-export function seedRack(formId, charms) {
-  const out = Array(formOf(formId).slots).fill(null)
+// A chain can cap its own spots (the fine chain is a one-charm pendant).
+export const slotsOf = (formId, chainId) => chainOf(chainId)?.slots ?? formOf(formId).slots
+
+export function seedRack(formId, charms, chainId) {
+  const out = Array(slotsOf(formId, chainId)).fill(null)
   const list = charms.slice(0, out.length)
   const offset = Math.floor((out.length - list.length) / 2)
   list.forEach((id, i) => (out[offset + i] = id))

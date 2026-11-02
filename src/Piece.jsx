@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { chainOf, charmOf, formOf } from './data.js'
+import { chainOf, charmOf, formOf, slotsOf } from './data.js'
 
 export const VIEW = 640
 
@@ -70,7 +70,7 @@ export function geometry(formId, chainId) {
   const linkCount = Math.max(8, Math.round(total / chain.linkLen))
   return {
     links: walk(points, linkCount),
-    slots: walk(points, form.slots, total * { bracelet: 0.17, necklace: 0.13, keyring: 0.2 }[formId]),
+    slots: walk(points, slotsOf(formId, chainId), total * { bracelet: 0.17, necklace: 0.13, keyring: 0.2 }[formId]),
     ends: [points[0], points[points.length - 1]],
     // Fewer, larger spots on the keyring: charms read bigger there.
     scale: formId === 'keyring' ? 1.25 : 1,

@@ -3,22 +3,20 @@ import { Flourish, Frame } from './Ornament.jsx'
 import Piece, { VIEW, geometry } from './Piece.jsx'
 import { ASSEMBLY, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
 
-const emptyRack = (formId) => Array(formOf(formId).slots).fill(null)
-
 export default function Builder({ start, onBack, onAdd }) {
   // One builder per form: a bracelet page never turns into a necklace page.
   const form = start.form
   const chains = chainsFor(form)
-  const [chain, setChain] = useState(() =>
-    chains.some((c) => c.id === start.chain) ? start.chain : chains[0].id,
-  )
+  const startChain = chains.some((c) => c.id === start.chain) ? start.chain : chains[0].id
+  const [chain, setChain] = useState(startChain)
   const [size, setSize] = useState(() => charmOf(start.charms[0])?.size || 'small')
   const [assembly, setAssembly] = useState('exact')
-  const [rack, setRack] = useState(() => seedRack(start.form, start.charms))
+  const [rack, setRack] = useState(() => seedRack(start.form, start.charms, startChain))
   const [drag, setDrag] = useState(null)
   const [toast, setToast] = useState('')
 
   const svgRef = useRef(null)
+  const wellRef = useRef(null)
   const trashRef = useRef(null)
   const slots = useMemo(() => geometry(form, chain).slots, [form, chain])
 
@@ -27,7 +25,25 @@ export default function Builder({ start, onBack, onAdd }) {
 
   const countOf = (id) => rack.filter((x) => x === id).length
 
+  // A pendant (one spot) swaps its charm instead of filling up.
+  const single = rack.length === 1
+
+  const pickChain = (id) => {
+    setChain(id)
+    const kept = rack.filter(Boolean)
+    const next = seedRack(form, kept, id)
+    if (next.length === rack.length) return
+    setRack(next)
+    if (next.length === 1 && kept.length > 1) {
+      setToast(`The fine chain is a pendant: it holds one charm, so we kept the ${charmOf(kept[0]).name}.`)
+    }
+  }
+
   const add = (id) => {
+    if (single) {
+      setRack([id])
+      return
+    }
     const i = nextFreeSlot(rack)
     if (i === -1) {
       setToast(`All ${rack.length} spots are taken — take a charm off first.`)
@@ -104,6 +120,61 @@ export default function Builder({ start, onBack, onAdd }) {
     }
   }, [drag, slots, toSvg])
 
+  // Two fingers on the bench zoom and pan the piece inside its circle; one finger
+  // still drags charms. The bench itself, its frame and the bar never move.
+  useEffect(() => {
+    const well = wellRef.current
+    const inner = svgRef.current
+    let z = { s: 1, x: 0, y: 0 }
+    let from = null
+    const pair = (t) => ({
+      d: Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY),
+      x: (t[0].clientX + t[1].clientX) / 2,
+      y: (t[0].clientY + t[1].clientY) / 2,
+    })
+    const apply = () => (inner.style.transform = z.s === 1 ? '' : `translate(${z.x}px, ${z.y}px) scale(${z.s})`)
+    const start = (e) => {
+      if (e.touches.length !== 2) return
+      setDrag(null)
+      const box = well.getBoundingClientRect()
+      const p = pair(e.touches)
+      // The point between the fingers, in unzoomed piece coordinates.
+      from = { z, d: p.d, px: (p.x - box.left - z.x) / z.s, py: (p.y - box.top - z.y) / z.s }
+    }
+    const move = (e) => {
+      if (!from || e.touches.length !== 2) return
+      e.preventDefault()
+      const box = well.getBoundingClientRect()
+      const p = pair(e.touches)
+      const s = Math.min(3, Math.max(1, (from.z.s * p.d) / from.d))
+      const clamp = (v, size) => Math.min(0, Math.max(size * (1 - s), v))
+      z = {
+        s,
+        x: clamp(p.x - box.left - from.px * s, box.width),
+        y: clamp(p.y - box.top - from.py * s, box.height),
+      }
+      apply()
+    }
+    const end = (e) => {
+      if (e.touches.length >= 2) return
+      from = null
+      if (z.s < 1.08) {
+        z = { s: 1, x: 0, y: 0 }
+        apply()
+      }
+    }
+    well.addEventListener('touchstart', start, { passive: true })
+    well.addEventListener('touchmove', move, { passive: false })
+    well.addEventListener('touchend', end)
+    well.addEventListener('touchcancel', end)
+    return () => {
+      well.removeEventListener('touchstart', start)
+      well.removeEventListener('touchmove', move)
+      well.removeEventListener('touchend', end)
+      well.removeEventListener('touchcancel', end)
+    }
+  }, [])
+
   useEffect(() => {
     if (!toast) return
     const t = setTimeout(() => setToast(''), 3200)
@@ -124,7 +195,8 @@ export default function Builder({ start, onBack, onAdd }) {
       <div className="builder-grid">
         <div className="bench">
           <Frame className="bench-frame">
-            <div className="bench-well" ref={svgRef}>
+            <div className="bench-well" ref={wellRef}>
+              <div className="bench-zoom" ref={svgRef}>
               <Piece
                 form={form}
                 chain={chain}
@@ -136,13 +208,14 @@ export default function Builder({ start, onBack, onAdd }) {
                 ghost={drag ? drag.at : null}
                 idle={!drag}
               />
+              </div>
             </div>
           </Frame>
 
           <div className="bench-bar">
             <button
               className="bar-reset"
-              onClick={() => setRack(emptyRack(form))}
+              onClick={() => setRack(seedRack(form, [], chain))}
               aria-label="Clear every charm"
               title="Clear every charm"
             >
@@ -211,7 +284,7 @@ export default function Builder({ start, onBack, onAdd }) {
                 <button
                   key={c.id}
                   className={`tile${chain === c.id ? ' is-on' : ''}`}
-                  onClick={() => setChain(c.id)}
+                  onClick={() => pickChain(c.id)}
                   aria-pressed={chain === c.id}
                 >
                   <img src={c.img} alt="" width="120" height="120" loading="lazy" />
@@ -231,8 +304,9 @@ export default function Builder({ start, onBack, onAdd }) {
               Pick your charms &amp; placement
             </h2>
             <p className="panel-lede">
-              Tap a charm to hang it on the next free spot. Drag charms around the piece, or onto
-              the bar to take one off.
+              {single
+                ? 'The fine chain is worn as a pendant with one charm. Tap a charm to hang it; tap another to swap.'
+                : 'Tap a charm to hang it on the next free spot. Drag charms around the piece, or onto the bar to take one off.'}
             </p>
 
             <div className="sizes" role="tablist" aria-label="Charm size">
@@ -262,7 +336,7 @@ export default function Builder({ start, onBack, onAdd }) {
                     <button
                       className="tile-add"
                       onClick={() => add(c.id)}
-                      disabled={placed >= rack.length}
+                      disabled={placed >= rack.length && !single}
                       aria-label={`Add one ${c.name}`}
                     >
                       <img src={c.img} alt="" loading="lazy" />
@@ -277,7 +351,7 @@ export default function Builder({ start, onBack, onAdd }) {
                       <output aria-label={`${c.name} on the piece`}>{n}</output>
                       <button
                         onClick={() => add(c.id)}
-                        disabled={placed >= rack.length}
+                        disabled={placed >= rack.length && !single}
                         aria-label={`Add one ${c.name}`}
                       >
                         +
