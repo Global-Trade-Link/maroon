@@ -26,11 +26,12 @@ import {
 // Each buildable category shows its "Build your own" arrangement.
 const buildFor = (form) => BUILDS.find((b) => b.form === form)
 
-// The hero turns through photographed best sellers (they stay on the Best sellers shelf too).
-const SHOWS = ['best-seaside', 'best-citrus', 'best-pearl-hoops'].map((id) => BESTSELLERS.find((p) => p.id === id))
-
-// Charms drifting round the hero oval: red, blue-and-white and pink read well on maroon.
-const HERO_FLOATS = ['cherry', 'porcheart', 'blossom']
+// The hero wall: photographed best sellers plus a stacked-wrist shot, edge to edge behind the copy.
+const REEL = [
+  ...['best-seaside', 'best-citrus'].map((id) => BESTSELLERS.find((p) => p.id === id).img),
+  '/shop/hero-stack.jpg',
+  BESTSELLERS.find((p) => p.id === 'best-pearl-hoops').img,
+]
 
 // One face for each charm size; the builder opens on that size's tab.
 const SIZE_FACES = [['small', 'pearl'], ['medium', 'cherry'], ['big', 'blossom'], ['bulky', 'locket']]
@@ -92,11 +93,6 @@ function Item({ media, name, price, onMedia, onAdd, label }) {
 }
 
 export default function Landing({ page, onOpen, onAdd, cart }) {
-  const [show, setShow] = useState(0)
-  const [hold, setHold] = useState(false) // pointer or focus is on the piece
-  const [paused, setPaused] = useState(false) // visitor stopped the slideshow
-  const [picked, setPicked] = useState(false) // visitor chose a piece; only then announce it
-  const hero = SHOWS[show]
   const [onHero, setOnHero] = useState(true)
 
   // Masthead goes maroon while it sits over a maroon section.
@@ -122,14 +118,6 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       window.removeEventListener('resize', check)
     }
   }, [page])
-
-  // The hero turns through the best sellers. Hover or focus holds it; a touch, a dot,
-  // or the pause button stops it for good (WCAG 2.2.2).
-  useEffect(() => {
-    if (hold || paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const t = setTimeout(() => setShow((i) => (i + 1) % SHOWS.length), 5200)
-    return () => clearTimeout(t)
-  }, [show, hold, paused])
 
   const photo = (p) => ({
     media: <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} />,
@@ -231,96 +219,34 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       ) : (
       <>
       <section className="hero" id="top">
-        <Frame className="hero-frame">
-          <Garland className="hero-garland" />
-          <div className="hero-copy">
-            <Crest />
-            <h1>
-              Charms that carry <span>a story</span>
-            </h1>
-            <Flourish />
-            <p className="hero-lede">
-              Pick the chain, hang the charms, and move them link by link until the piece reads
-              the way you meant it. Then we set it by hand and send it to you.
-            </p>
-            <div className="hero-acts">
-              <button className="btn" onClick={() => onOpen(BUILDS[0])}>
-                Build your own
-              </button>
-              <a className="btn btn-line" href="#best">
-                Shop best sellers
-              </a>
-            </div>
-            <p className="hero-vow">
-              <span>Set by hand</span>
-              <span>18K gold PVD</span>
-              <span>Waterproof</span>
-            </p>
-          </div>
-
-          <div
-            className="hero-piece"
-            onPointerMove={(e) => {
-              const r = e.currentTarget.getBoundingClientRect()
-              e.currentTarget.style.setProperty('--mx', ((e.clientX - r.left) / r.width - 0.5) * 2)
-              e.currentTarget.style.setProperty('--my', ((e.clientY - r.top) / r.height - 0.5) * 2)
-            }}
-            onPointerEnter={() => setHold(true)}
-            onPointerDown={(e) => e.pointerType === 'touch' && setPaused(true)}
-            onFocus={() => setHold(true)}
-            onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setHold(false)}
-            onPointerLeave={(e) => {
-              e.currentTarget.style.setProperty('--mx', 0)
-              e.currentTarget.style.setProperty('--my', 0)
-              setHold(false)
-            }}
-          >
-            <button
-              className="hero-open"
-              onClick={() =>
-                window.location.hash === '#best'
-                  ? document.getElementById('best').scrollIntoView({ behavior: 'smooth' })
-                  : (window.location.hash = '#best')
-              }
-              aria-label={`See ${hero.name} in Best sellers`}
-            >
-              <span className="hero-oval" aria-hidden="true">
-                <img key={hero.id} className="hero-photo" src={hero.img} alt="" />
-              </span>
-              {HERO_FLOATS.map((id, i) => (
-                <img key={id} className={`hero-float hero-float-${'abc'[i]}`} src={CHARMS.find((c) => c.id === id).img} alt="" aria-hidden="true" />
-              ))}
+        <div className="hero-wall" aria-hidden="true">
+          {REEL.map((src) => (
+            <img key={src} src={src} alt="" />
+          ))}
+        </div>
+        <Garland className="hero-garland" />
+        <div className="hero-copy">
+          <p className="hero-vow">
+            <span>Set by hand</span>
+            <span>18K gold PVD</span>
+            <span>Waterproof</span>
+          </p>
+          <h1>
+            Charms that carry <span>a story</span>
+          </h1>
+          <p className="hero-lede">
+            Pick the chain, hang the charms, and move them link by link until the piece reads
+            the way you meant it. Then we set it by hand and send it to you.
+          </p>
+          <div className="hero-acts">
+            <button className="btn" onClick={() => onOpen(BUILDS[0])}>
+              Build your own
             </button>
-            <div className="hero-tag" aria-live={picked ? 'polite' : 'off'}>
-              <b>{hero.name}</b>
-              <span>{npr(hero.price)}</span>
-              <span className="hero-dots">
-                {SHOWS.map((p, i) => (
-                  <button
-                    key={p.id}
-                    className={i === show ? 'is-on' : ''}
-                    onClick={() => {
-                      setShow(i)
-                      setPicked(true)
-                      setPaused(true)
-                    }}
-                    aria-label={`Show ${p.name}`}
-                    aria-pressed={i === show}
-                  />
-                ))}
-              </span>
-              <button
-                className="hero-pause"
-                onClick={() => setPaused((v) => !v)}
-                aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
-              >
-                <svg viewBox="0 0 12 12" aria-hidden="true">
-                  {paused ? <path d="M3 1.5v9l7.5-4.5z" fill="currentColor" /> : <path d="M3 1.5v9M9 1.5v9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
-                </svg>
-              </button>
-            </div>
+            <a className="btn btn-line" href="#best">
+              Shop best sellers
+            </a>
           </div>
-        </Frame>
+        </div>
       </section>
 
       <section className="hero-story">

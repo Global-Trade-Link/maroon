@@ -11,15 +11,21 @@ export const VIEW = 640
 const SHAPES = {
   // A bracelet is a closed loop: its two ends meet at the clasp at the top.
   bracelet: { cx: 320, cy: 312, rx: 206, ry: 214, from: -85, to: 265 },
-  necklace: { cx: 320, cy: 58, rx: 192, ry: 424, from: 14, to: 166 },
-  // A loop of chain whose two ends meet in the ring under the lobster clasp.
-  keyring: { cx: 320, cy: 372, rx: 150, ry: 176, from: -86, to: 266 },
+  necklace: { cx: 320, cy: 46, rx: 222, ry: 456, from: 14, to: 166 },
 }
 
-// Hoops and the pin are not chains: their charms hang from fixed points.
-const HOOPS = [{ x: 196, y: 196 }, { x: 444, y: 196 }]
-const HOOP_R = 92
-const PIN_LOOPS = [208, 320, 432]
+// Hoops, keyring and pin are photographed bases, not drawn chains: each photo
+// sits at a fixed spot and its charms hang from points measured off the photo.
+const BASES = {
+  earrings: { src: '/bases/hoop.webp', x: 140, y: 110, w: 360, h: 247 },
+  keyring: { src: '/bases/keyring.webp', x: 125, y: 20, w: 322, h: 600 },
+  brooch: { src: '/bases/pin.webp', x: 50, y: 150, w: 560, h: 185 },
+}
+const HOOP_SLOTS = [{ x: 211, y: 350 }, { x: 419, y: 350 }]
+const PIN_LOOPS = [200, 285, 369]
+// The keyring's dangling chain runs straight down x = 320 from y 210 to 600.
+const KEY_TOP = 215
+const KEY_BOTTOM = 495
 
 const rad = (deg) => (deg * Math.PI) / 180
 
@@ -60,20 +66,29 @@ export function geometry(formId, chainId) {
   const form = formOf(formId)
   const chain = chainOf(chainId)
   if (formId === 'earrings') {
-    return { links: [], ends: [], slots: HOOPS.map((h) => ({ x: h.x, y: h.y + HOOP_R, ang: 0 })), scale: 2, chain, form }
+    return { links: [], ends: [], slots: HOOP_SLOTS.map((h) => ({ ...h, ang: 0 })), scale: 2, chain, form }
   }
   if (formId === 'brooch') {
-    return { links: [], ends: [], slots: PIN_LOOPS.map((x) => ({ x, y: 296, ang: 0 })), scale: 1.4, chain, form }
+    return { links: [], ends: [], slots: PIN_LOOPS.map((x) => ({ x, y: 322, ang: 0 })), scale: 1.4, chain, form }
+  }
+  if (formId === 'keyring') {
+    const n = slotsOf(formId, chainId)
+    // Charms alternate off either side of the links so a full chain doesn't stack into one column.
+    const slots = Array.from({ length: n }, (_, i) => ({
+      x: 320 + (i % 2 ? 9 : -9),
+      y: KEY_TOP + ((KEY_BOTTOM - KEY_TOP) * i) / Math.max(1, n - 1),
+      ang: 0,
+    }))
+    return { links: [], ends: [], slots, scale: 1, chain, form }
   }
   const points = sample(SHAPES[formId])
   const total = points[points.length - 1].s
   const linkCount = Math.max(8, Math.round(total / chain.linkLen))
   return {
     links: walk(points, linkCount),
-    slots: walk(points, slotsOf(formId, chainId), total * { bracelet: 0.17, necklace: 0.13, keyring: 0.2 }[formId]),
+    slots: walk(points, slotsOf(formId, chainId), total * { bracelet: 0.17, necklace: 0.13 }[formId]),
     ends: [points[0], points[points.length - 1]],
-    // Fewer, larger spots on the keyring: charms read bigger there.
-    scale: formId === 'keyring' ? 1.25 : 1,
+    scale: 1,
     clasp: { x: SHAPES[formId].cx, y: SHAPES[formId].cy - SHAPES[formId].ry, ang: 0 },
     chain,
     form,
@@ -99,6 +114,17 @@ function Link({ p, i, chain, gold }) {
         strokeWidth={chain.wire}
         transform={`translate(${p.x} ${p.y}) rotate(${p.ang})`}
       />
+    )
+  }
+  // Oval knot chain: big upright ovals, every other link a short coiled bar.
+  if (chain.link === 'knot' && flat) {
+    return (
+      <g stroke={gold} transform={`translate(${p.x} ${p.y}) rotate(${p.ang})`}>
+        <path d={`M${-L * 0.42} 0H${L * 0.42}`} strokeWidth={chain.wire} strokeLinecap="round" />
+        {[-0.14, 0, 0.14].map((k) => (
+          <ellipse key={k} cx={L * k} cy="0" rx={L * 0.05} ry={chain.wire * 1.15} fill={gold} strokeWidth="0.6" />
+        ))}
+      </g>
     )
   }
   return (
@@ -129,48 +155,11 @@ function Clasp({ p, gold, wire }) {
   )
 }
 
-function Hoops({ gold }) {
-  return HOOPS.map((h, i) => (
-    <g key={i}>
-      <circle cx={h.x} cy={h.y} r={HOOP_R} fill="none" stroke={gold} strokeWidth="11" />
-      <path d={`M${h.x - 7} ${h.y - HOOP_R - 9}h14`} stroke="#a87b1d" strokeWidth="3" strokeLinecap="round" />
-    </g>
-  ))
-}
-
-// A split ring, a swivel, then a lobster clasp whose bottom ring takes both chain ends.
-// No perfectly straight strokes: a gradient stroke on a flat box draws nothing.
-function KeyTop({ gold, wire }) {
-  return (
-    <g fill="none" stroke={gold} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="320" cy="76" r="52" strokeWidth="9" />
-      <circle cx="320" cy="76" r="44" strokeWidth="2.5" opacity="0.7" />
-      <ellipse cx="320" cy="134" rx="8" ry="13" strokeWidth={wire * 1.5} />
-      <path d="M320 148c-18 2-24 24-14 40 6 9 22 9 28 0 10-16 4-38-14-40z" strokeWidth={wire * 2} />
-      <path d="M327 157c7 9 8 21 2 30" strokeWidth={wire * 1.2} />
-      <circle cx="320" cy="200" r="11" strokeWidth={wire * 1.5} />
-    </g>
-  )
-}
-
-function Pin({ gold }) {
-  return (
-    <g fill="none" stroke={gold} strokeLinecap="round" strokeLinejoin="round">
-      {/* One path: a gradient stroke on a perfectly flat line has no box and draws nothing. */}
-      <path d="M132 246H500M132 276H530" strokeWidth="7" />
-      <circle cx="122" cy="261" r="17" strokeWidth="7" />
-      <rect x="492" y="232" width="48" height="58" rx="18" strokeWidth="7" />
-      {PIN_LOOPS.map((x) => (
-        <circle key={x} cx={x} cy={286} r="9" strokeWidth="5" />
-      ))}
-    </g>
-  )
-}
-
 function Charm({ id, p, held, onGrab, index, scale = 1 }) {
   const charm = charmOf(id)
   if (!charm) return null
-  const { w, h } = charm
+  // ax: where the charm's own loop sits across its width (most are centred).
+  const { w, h, ax = 0.5 } = charm
   // The translate lives on an outer group: the sway animation writes a CSS
   // transform, which would otherwise overwrite a transform attribute here.
   return (
@@ -181,7 +170,7 @@ function Charm({ id, p, held, onGrab, index, scale = 1 }) {
         style={{ ['--sway']: `${(index % 5) * -0.4}s` }}
       >
         <circle cx="0" cy="0" r="6.5" fill="none" stroke="url(#mr-gold)" strokeWidth="3.4" />
-        <image href={charm.img} x={-w / 2} y={7} width={w} height={h} preserveAspectRatio="xMidYMin meet" />
+        <image href={charm.img} x={-w * ax} y={7} width={w} height={h} preserveAspectRatio="xMidYMin meet" />
         {onGrab && <circle className="charm-grab" cx="0" cy={7 + h * 0.5} r={Math.max(w, h) * 0.52} />}
       </g>
     </g>
@@ -221,12 +210,8 @@ export default function Piece({
         {g.links.map((p, i) => (
           <Link key={i} p={p} i={i} chain={g.chain} gold="url(#mr-gold)" />
         ))}
-        {form === 'earrings' ? (
-          <Hoops gold="url(#mr-gold)" />
-        ) : form === 'brooch' ? (
-          <Pin gold="url(#mr-gold)" />
-        ) : form === 'keyring' ? (
-          <KeyTop gold="url(#mr-gold)" wire={g.chain.wire} />
+        {BASES[form] ? (
+          <image href={BASES[form].src} x={BASES[form].x} y={BASES[form].y} width={BASES[form].w} height={BASES[form].h} />
         ) : form === 'bracelet' ? (
           <Clasp p={g.clasp} gold="url(#mr-gold)" wire={g.chain.wire} />
         ) : (
