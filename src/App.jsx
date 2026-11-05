@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Landing from './Landing.jsx'
 import Builder from './Builder.jsx'
-import { PAGES, npr } from './data.js'
+import { DETAILS, PAGES, npr } from './data.js'
 
 export default function App() {
   const [start, setStart] = useState(null)
@@ -13,6 +13,7 @@ export default function App() {
   // is an anchor on the home page.
   const [path, part] = hash.startsWith('#/') ? hash.slice(2).split('/') : []
   const page = PAGES[path] ? path : null
+  const product = DETAILS[path]?.items?.find((p) => p.id === part)
 
   useEffect(() => {
     const onHash = () => {
@@ -27,7 +28,7 @@ export default function App() {
   // Moving between sections of the home page glides instead.
   const view = useRef(null)
   useEffect(() => {
-    const now = start ? 'builder' : page || 'home'
+    const now = start ? 'builder' : product?.id || page || 'home'
     const glide = view.current === now
     view.current = now
     const el = now === 'home' ? hash.length > 1 && document.getElementById(hash.slice(1)) : part && document.getElementById(part)
@@ -61,6 +62,8 @@ export default function App() {
       ) : (
         <Landing
           page={page}
+          product={product}
+          section={path}
           onOpen={setStart}
           onAdd={(item) => {
             setCart((c) => [...c, item])
