@@ -230,6 +230,7 @@ a { color: inherit; text-underline-offset: 4px; }
 }
 /* The footer's garland, strung across the top of the photo wall. */
 .hero .hero-garland { position: absolute; top: 0; left: 0; right: 0; margin: 0; pointer-events: none; }
+.hero-garland a { pointer-events: auto; }
 .hero-copy { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 980px; text-shadow: 0 2px 24px rgba(30, 6, 9, 0.55); }
 .hero h1 { margin-top: 18px; font-size: clamp(3.4rem, min(9vw, 15vh), 8.5rem); line-height: 0.98; color: #fff; }
 .hero h1 span { display: block; }
@@ -543,7 +544,11 @@ a { color: inherit; text-underline-offset: 4px; }
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(16px, 2vw, 28px);
 }
-.item { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.item { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.item-cart { position: absolute; z-index: 1; top: 10px; right: 10px; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: var(--card); color: var(--maroon); box-shadow: 0 4px 12px -4px rgba(79, 19, 26, 0.45); transition: background 0.2s ease, color 0.2s ease, transform 160ms var(--ease-out); }
+.item-cart svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) { .item-cart:hover { background: var(--maroon); color: #fff; } }
+.item-cart:active { transform: scale(0.92); }
 .item-media {
   width: 100%;
   aspect-ratio: 1;
@@ -569,6 +574,31 @@ a { color: inherit; text-underline-offset: 4px; }
 .item h3 { font-size: 0.92rem; }
 .item .btn { margin-top: 12px; width: 100%; }
 
+/* ---------- product detail ---------- */
+.detail { max-width: 1120px; margin-inline: auto; padding: clamp(28px, 4vw, 56px) var(--gutter) clamp(56px, 7vw, 100px); }
+.detail-back { display: inline-block; padding: 10px 0; font-family: var(--sans); font-style: normal; font-weight: 600; font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--maroon); }
+.detail-back::before { content: '\2190\00a0'; }
+.detail-grid { margin-top: 16px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+.detail-photo { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 14px; background: var(--bg-tint); }
+.detail-photo .item-photo { object-fit: contain; }
+.detail-photo .is-cutout { inset: 14%; width: 72%; height: 72%; }
+.detail-photo .piece { width: 100%; height: 100%; }
+.detail-info { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.detail-info h1 { font-family: var(--sans); font-weight: 600; font-size: clamp(1.3rem, 2.2vw, 1.7rem); letter-spacing: 0.08em; line-height: 1.2; text-transform: uppercase; color: var(--ink); }
+.detail-note { margin-top: 8px; font-size: 1.15rem; }
+.detail-pick { margin-top: 18px; width: 100%; }
+.detail-pick > div { margin-top: 10px; display: flex; gap: 12px; }
+.detail-pick button { flex: 0 1 112px; min-width: 0; padding: 0; border: 0; background: none; color: var(--ink); font-family: var(--sans); font-style: normal; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.06em; }
+.detail-pick img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); transition: box-shadow 0.2s ease; }
+.detail-pick .is-on img { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--maroon); }
+.detail-spec { margin: 18px 0 14px; padding: 16px 0 0; width: 100%; list-style: none; border-top: 1px solid var(--line-strong); display: grid; gap: 4px; font-size: 1.1rem; }
+.detail-info .btn { width: 100%; max-width: 340px; }
+.item h3 a { color: inherit; text-decoration: none; }
+@media (max-width: 760px) {
+  .detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .detail-info .btn { max-width: none; }
+}
+
 /* ---------- styled by you ---------- */
 .styled {
   text-align: center;
@@ -592,25 +622,6 @@ a { color: inherit; text-underline-offset: 4px; }
   box-shadow: 0 0 0 1px rgba(217, 178, 90, 0.5), 0 18px 34px -18px rgba(0, 0, 0, 0.6);
 }
 
-/* ---------- chains ---------- */
-.chain-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(24px, 3vw, 44px);
-}
-.chain-card { display: flex; flex-direction: column; }
-.chain-card img {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: contain;
-  padding: 12%;
-  background: radial-gradient(circle at 50% 42%, #fff, var(--card) 60%, var(--bg-tint));
-  border-radius: 14px;
-  margin-bottom: 18px;
-}
-.chain-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.chain-card p { margin: 6px 0 18px; }
-.chain-card .btn { align-self: flex-start; margin-top: auto; }
 
 /* ---------- close + footer ---------- */
 .close {
@@ -659,6 +670,7 @@ a { color: inherit; text-underline-offset: 4px; }
 }
 .foot-garland li { display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; animation: sway 5s var(--sway) ease-in-out infinite; }
 .foot-garland li::before { content: ''; width: 2px; height: 18px; background: var(--gold); }
+.foot-garland a { display: block; }
 .foot-garland img { height: clamp(40px, 4vw, 58px); width: auto; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.35)); }
 .foot-inner { max-width: 940px; margin: 36px auto 0; }
 .foot-logo { margin: 0 auto; width: 88px; height: 88px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(243, 230, 214, 0.4), 0 0 0 6px var(--maroon-deep), 0 0 0 7px rgba(213, 171, 60, 0.6); }
@@ -837,12 +849,12 @@ img[loading='lazy'].is-loaded { animation: photo-in 0.7s var(--ease) both; }
 @keyframes photo-in { from { opacity: 0; filter: blur(8px); } }
 
 /* Shop-page cards rise in one after another, slow enough to read as an entrance. */
-.page .item, .page .chain-card { animation: card-in 1.1s var(--ease) both; }
-.page :is(.item, .chain-card):nth-child(2) { animation-delay: 120ms; }
-.page :is(.item, .chain-card):nth-child(3) { animation-delay: 240ms; }
-.page :is(.item, .chain-card):nth-child(4) { animation-delay: 360ms; }
-.page :is(.item, .chain-card):nth-child(5) { animation-delay: 480ms; }
-.page :is(.item, .chain-card):nth-child(n + 6) { animation-delay: 600ms; }
+.page .item { animation: card-in 1.1s var(--ease) both; }
+.page .item:nth-child(2) { animation-delay: 120ms; }
+.page .item:nth-child(3) { animation-delay: 240ms; }
+.page .item:nth-child(4) { animation-delay: 360ms; }
+.page .item:nth-child(5) { animation-delay: 480ms; }
+.page .item:nth-child(n + 6) { animation-delay: 600ms; }
 .page img[loading='lazy'].is-loaded { animation-duration: 1.2s; }
 @keyframes card-in { from { opacity: 0; transform: translateY(28px); } }
 
@@ -1181,7 +1193,6 @@ button.tile:hover img { box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 6px var(
   .range { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cat, .cat:nth-child(-n + 2), .cat:nth-child(n + 6) { grid-column: span 1; }
   .cat:first-child { grid-column: span 2; }
-  .chain-row { grid-template-columns: 1fr; max-width: 440px; }
   .build-row, .shelf-row {
     display: flex;
     overflow-x: auto;
@@ -1265,8 +1276,8 @@ button.tile:hover img { box-shadow: 0 0 0 1px var(--line-strong), 0 0 0 6px var(
   .hero-story li a:hover::before { transform: rotate(40deg) scale(1.04); }
   .hero-story li a:hover img { transform: rotate(-6deg) scale(1.06); }
   .cats a:hover .item-photo, .cats a:hover .cats-charm { transform: scale(1.04); }
-  button.item-media:hover .piece, .build-media:hover .piece { transform: translateY(-4px) scale(1.03); }
-  button.item-media:hover .item-photo { transform: scale(1.04); }
+  a.item-media:hover .piece, .build-media:hover .piece { transform: translateY(-4px) scale(1.03); }
+  a.item-media:hover .item-photo { transform: scale(1.04); }
   .item-media:hover .item-charm { transform: rotate(-5deg) scale(1.05); }
   .bar-reset:hover { background: rgba(110, 31, 39, 0.08); transform: rotate(-70deg); }
   .tiles-charm .tile:hover img { transform: rotate(-4deg); }

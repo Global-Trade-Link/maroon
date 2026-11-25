@@ -1,3 +1,5 @@
+import { presentProducts } from './productCatalog.js'
+
 // MAROON demo catalogue.
 // Prices are illustrative placeholders for the demo, not real pricing.
 // All amounts are Nepalese rupees, stored as plain integers.
@@ -171,7 +173,6 @@ export const PAGES = {
   charms: { name: 'Charms', line: 'Thirty charms in four sizes, small to bulky. Every one is in the builder.', img: '/shop/best9.jpg' },
   belts: { name: 'Belts', line: 'Western buckles, hearts, stars and leopard.', img: '/shop/belt3.jpg' },
   armcuffs: { name: 'Armcuffs', line: 'Wire-wrapped by hand around glass flowers and beads. Worn high on the arm.', img: '/shop/cuff1.jpg' },
-  chains: { name: 'Chains', line: 'Five chains of gold, from barely there to wide and loud.', img: '/shop/best4.jpg' },
 }
 
 // Shop by category on the home page; each one has its own page at #/<id>.
@@ -242,37 +243,66 @@ export const BESTSELLERS = [
 ]
 
 export const EARRINGS = [
-  { id: 'ear-coral', name: 'Coral Bell Earrings', price: 2600, img: '/shop/ear1.jpg' },
-  { id: 'ear-citrine', name: 'Citrine Bell Earrings', price: 2600, img: '/shop/ear2.jpg' },
-  { id: 'ear-aqua', name: 'Aqua Bell Earrings', price: 2600, img: '/shop/ear3.jpg' },
-  { id: 'ear-rose', name: 'Rose Chain Earrings', price: 2900, img: '/shop/ear4.jpg' },
-  { id: 'ear-amethyst', name: 'Amethyst Bell Earrings', price: 2600, img: '/shop/ear5.jpg' },
+  { id: 'ear-coral', name: 'Coral Bell Earrings', price: 2600, img: '/shop/ear1.jpg', color: 'Coral' },
+  { id: 'ear-citrine', name: 'Citrine Bell Earrings', price: 2600, img: '/shop/ear2.jpg', color: 'Citrine' },
+  { id: 'ear-aqua', name: 'Aqua Bell Earrings', price: 2600, img: '/shop/ear3.jpg', color: 'Aqua' },
+  { id: 'ear-rose', name: 'Rose Chain Earrings', price: 2900, img: '/shop/ear4.jpg', color: 'Rose' },
+  { id: 'ear-amethyst', name: 'Amethyst Bell Earrings', price: 2600, img: '/shop/ear5.jpg', color: 'Amethyst' },
 ]
 
+// One card per belt. `options` are what a shopper picks between on its detail page;
+// a belt with no `color` of its own is picked by colour.
+const beltProductIds = { 3: 'belt-western', 6: 'belt-western-slim', 4: 'belt-heart', 5: 'belt-heart-wide', 10: 'belt-leopard', 11: 'belt-leopard-slim' }
+const styles = (...photos) => photos.map((n, i) => ({ label: `Style ${i + 1}`, img: `/shop/belt${n}.jpg`, productId: beltProductIds[n] }))
+
 export const BELTS = [
-  { id: 'belt-lace', name: 'Lace Belt', price: 3400, img: '/shop/belt1.jpg' },
-  { id: 'belt-star', name: 'Red Star Belt', price: 3800, img: '/shop/belt2.jpg' },
-  { id: 'belt-western', name: 'Western Buckle Belt', price: 4200, img: '/shop/belt3.jpg' },
-  { id: 'belt-heart', name: 'Heart Buckle Belt', price: 4200, img: '/shop/belt4.jpg' },
-  { id: 'belt-heart-wide', name: 'Wide Heart Belt', price: 4400, img: '/shop/belt5.jpg' },
-  { id: 'belt-western-slim', name: 'Slim Western Belt', price: 3600, img: '/shop/belt6.jpg' },
-  { id: 'belt-black', name: 'Slim Black Belt', price: 2800, img: '/shop/belt7.jpg' },
-  { id: 'belt-brown', name: 'Slim Brown Belt', price: 2800, img: '/shop/belt8.jpg' },
-  { id: 'belt-concho', name: 'Concho Belt', price: 4600, img: '/shop/belt9.jpg' },
-  { id: 'belt-leopard', name: 'Leopard Shell Belt', price: 3900, img: '/shop/belt10.jpg' },
-  { id: 'belt-leopard-slim', name: 'Slim Leopard Belt', price: 3400, img: '/shop/belt11.jpg' },
+  { id: 'belt-lace', name: 'Lace Belt', price: 3400, img: '/shop/belt1.jpg', color: 'White lace' },
+  { id: 'belt-star', name: 'Red Star Belt', price: 3800, img: '/shop/belt2.jpg', color: 'Red' },
+  { id: 'belt-western', name: 'Western Buckle Belt', price: 4200, img: '/shop/belt3.jpg', color: 'Antique brown', options: styles(3, 6) },
+  { id: 'belt-heart', name: 'Heart Buckle Belt', price: 4200, img: '/shop/belt4.jpg', color: 'Tan', options: styles(4, 5) },
+  {
+    id: 'belt-slim',
+    name: 'Slim Belt',
+    price: 2800,
+    img: '/shop/belt7.jpg',
+    options: [
+      { label: 'Black', img: '/shop/belt7.jpg', productId: 'belt-black' },
+      { label: 'Dark brown', img: '/shop/belt8.jpg', productId: 'belt-brown' },
+    ],
+  },
+  { id: 'belt-concho', name: 'Concho Belt', price: 4600, img: '/shop/belt9.jpg', color: 'Tan' },
+  { id: 'belt-leopard', name: 'Leopard Shell Belt', price: 3900, img: '/shop/belt10.jpg', color: 'Leopard', options: styles(10, 11) },
 ]
 
 export const ARMCUFFS = [
-  { id: 'cuff-worn', name: 'Ivory Bloom Armcuff', price: 4800, img: '/shop/cuff1.jpg', focus: '50% 52%' },
-  { id: 'cuff-ivory', name: 'Pearl Flower Armcuff', price: 4800, img: '/shop/cuff2.jpg' },
-  { id: 'cuff-silver', name: 'Silver Flower Armcuff', price: 4600, img: '/shop/cuff3.jpg' },
-  { id: 'cuff-pink', name: 'Pink Flower Armcuff', price: 4600, img: '/shop/cuff4.jpg' },
-  { id: 'cuff-peach', name: 'Peach Flower Armcuff', price: 4600, img: '/shop/cuff5.jpg' },
-  { id: 'cuff-pearl', name: 'Pearl Vine Armcuff', price: 4400, img: '/shop/cuff6.jpg' },
-  { id: 'cuff-leaf', name: 'Green Leaf Armcuff', price: 4400, img: '/shop/cuff7.jpg' },
-  { id: 'cuff-crystal', name: 'Crystal Swirl Armcuff', price: 4200, img: '/shop/cuff8.jpg' },
+  { id: 'cuff-worn', name: 'Ivory Bloom Armcuff', price: 4800, img: '/shop/cuff1.jpg', focus: '50% 52%', color: 'Ivory' },
+  {
+    id: 'cuff-flower',
+    name: 'Flower Armcuff',
+    price: 4600,
+    img: '/shop/cuff2.jpg',
+    options: [
+      { label: 'Pearl', img: '/shop/cuff2.jpg', productId: 'cuff-ivory' },
+      { label: 'Silver', img: '/shop/cuff3.jpg', productId: 'cuff-silver' },
+      { label: 'Pink', img: '/shop/cuff4.jpg', productId: 'cuff-pink' },
+      { label: 'Peach', img: '/shop/cuff5.jpg', productId: 'cuff-peach' },
+    ],
+  },
+  { id: 'cuff-pearl', name: 'Pearl Vine Armcuff', price: 4400, img: '/shop/cuff6.jpg', color: 'Pearl' },
+  { id: 'cuff-leaf', name: 'Green Leaf Armcuff', price: 4400, img: '/shop/cuff7.jpg', color: 'Green' },
+  { id: 'cuff-crystal', name: 'Crystal Swirl Armcuff', price: 4200, img: '/shop/cuff8.jpg', color: 'Crystal' },
 ]
+
+// Everything with a detail page at #/<section>/<id>, plus the lines every piece in a section shares.
+export const DETAILS = {
+  belts: { items: BELTS, spec: ['Size: 40 inches', 'Material: Imitation leather', 'Iron buckle'] },
+  armcuffs: { items: ARMCUFFS, spec: ['Completely handmade', 'Size: Adjustable', 'Material: Stainless steel and waterproof wires', 'Anti tarnish'] },
+  earrings: { items: [BUILDS.find((b) => b.form === 'earrings'), ...EARRINGS], spec: ['Completely handmade', 'Material: Stainless steel and waterproof wires', 'Crystals: Imitation', 'Anti tarnish'] },
+  bracelets: { items: BRACELETS },
+  charms: { items: CHARMS },
+  best: { items: BESTSELLERS },
+}
+const PRODUCT_TEMPLATES = [...BESTSELLERS, ...BRACELETS, ...EARRINGS, ...BELTS, ...ARMCUFFS]
 
 // Customer photographs for "Styled by you".
 export const STYLED = [
@@ -350,11 +380,22 @@ export function installCatalog(snapshot) {
   const visible = products.filter(validComposition)
   STORE.products = visible
   replace(BESTSELLERS, visible.filter((p) => p.featured))
-  for (const [category, target] of Object.entries({ bracelets: BRACELETS, earrings: EARRINGS, belts: BELTS, armcuffs: ARMCUFFS })) replace(target, visible.filter((p) => p.category === category))
+  const shelves = { bracelets: BRACELETS, earrings: EARRINGS, belts: BELTS, armcuffs: ARMCUFFS }
+  for (const [category, target] of Object.entries(shelves)) replace(target, presentProducts(visible.filter((p) => p.category === category), PRODUCT_TEMPLATES))
   replace(PRESETS, visible.filter((p) => p.form).slice(0, 3))
   replace(BUILDS, [...BUILDS].flatMap((b) => {
     const base = chainsFor(b.form).find((c) => c.id === b.chain) || chainsFor(b.form)[0]
     if (!base) return []
     return [{ ...b, chain: base.id, charms: b.charms.filter((id) => isAvailable(charmOf(id)) && charmOf(id).compatibleForms?.includes(b.form)).slice(0, slotsOf(b.form, base.id)) }]
   }))
+  // Rebind detail lists after installing the live catalog. Static list copies
+  // would otherwise show old names/prices or variants unavailable to checkout.
+  for (const [id, page] of Object.entries(PAGES)) {
+    const items = id === 'charms' ? [...CHARMS.filter(isAvailable), ...visible.filter((p) => p.category === 'charms')] : shelves[id] || visible.filter((p) => p.category === id)
+    DETAILS[id] = { ...DETAILS[id], items }
+  }
+  if (DETAILS.earrings) DETAILS.earrings.items = [...BUILDS.filter((b) => b.form === 'earrings'), ...EARRINGS]
+  if (DETAILS.chains) DETAILS.chains.items = [...CHAINS.filter((base) => isAvailable(base) && base.forms.some((form) => ['bracelet', 'necklace'].includes(form))), ...visible.filter((p) => p.category === 'chains')]
+  DETAILS.best = { ...DETAILS.best, items: BESTSELLERS }
+  for (const id of Object.keys(DETAILS)) if (id !== 'best' && !PAGES[id]) delete DETAILS[id]
 }

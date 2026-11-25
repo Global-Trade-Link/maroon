@@ -1,23 +1,21 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { PaymentContext } from './PaymentContext.js'
 import Piece from './Piece.jsx'
+import { toCartProduct } from './productCatalog.js'
 import { PromiseIcon } from './Icons.jsx'
 import { Crest, Flourish, Frame } from './Ornament.jsx'
 import {
-  ARMCUFFS,
-  BELTS,
   BESTSELLERS,
-  BRACELETS,
   BUILDS,
   CATEGORIES,
   PAGES,
   PROMISES,
-  CHAINS,
   CHARMS,
   CHARM_SIZES,
-  EARRINGS,
+  DETAILS,
   STYLED,
   chainOf,
+  charmOf,
   npr,
   priceOf,
   seedRack,
@@ -25,9 +23,6 @@ import {
   isAvailable,
 } from './data.js'
 
-
-// Each buildable category shows its "Build your own" arrangement.
-const buildFor = (form) => BUILDS.find((b) => b.form === form)
 
 // The hero wall: photographed best sellers plus a stacked-wrist shot, edge to edge behind the copy.
 const REEL = [
@@ -45,15 +40,16 @@ const CLOSE_CHARMS = ['cherry', 'starfish', 'blossom', 'letter']
 const GARLAND = ['pearl', 'cherry', 'shell', 'bow', 'blossom', 'letter', 'turtle', 'porcheart', 'starfish', 'tear', 'locket', 'cube', 'boot']
 
 // Chains you can choose; the fixed bases (hoops, keyring, pin) live in their own builders.
-const REAL_CHAINS = CHAINS.filter((c) => isAvailable(c) && (c.forms.includes('bracelet') || c.forms.includes('necklace')))
 
 // Gold line with charms hanging off it; shared by the masthead and the footer.
 function Garland({ className = '' }) {
   return (
-    <ul className={`foot-garland ${className}`} aria-hidden="true">
-      {GARLAND.map((id, i) => (
+    <ul className={`foot-garland ${className}`} aria-label="Charms">
+      {GARLAND.filter((id) => isAvailable(charmOf(id))).map((id, i) => (
         <li key={i} data-charm={id} style={{ '--sway': `${(i % 4) * -0.6}s` }}>
-          <img src={`/charms/${id}.webp`} alt="" loading="lazy" />
+          <a href={`#/charms/${id}`} aria-label={charmOf(id).name}>
+            <img src={charmOf(id).img} alt="" loading="lazy" />
+          </a>
         </li>
       ))}
     </ul>
@@ -75,28 +71,144 @@ function Shelf({ id, title, line, children }) {
   )
 }
 
-// One product on a shelf: media, plain black name and price, line button.
-function Item({ media, name, price, onMedia, onAdd, label, description }) {
+// One product on a shelf: media, plain black name and price, a way into its detail page.
+function Item({ media, name, price, href, onAdd }) {
   return (
     <article className="item">
-      {onMedia ? (
-        <button className="item-media" onClick={onMedia} aria-label={`Open ${name} in the builder`}>
-          {media}
+      {onAdd && (
+        <button className="item-cart" onClick={onAdd} aria-label={`Add ${name} to cart`} title="Add to cart">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 4h2.2l2.3 11h10.2l2-8H6.2" />
+            <circle cx="9.5" cy="19.5" r="1.4" />
+            <circle cx="16.5" cy="19.5" r="1.4" />
+          </svg>
         </button>
-      ) : (
-        <span className="item-media">{media}</span>
       )}
-      <h3>{name}</h3>
-      {description && <p className="item-description">{description}</p>}
+      <a className="item-media" href={href} tabIndex={-1} aria-hidden="true">
+        {media}
+      </a>
+      <h3>
+        <a href={href}>{name}</a>
+      </h3>
       <span className="price">{price}</span>
-      <button className="btn btn-line btn-sm" onClick={onAdd}>
-        {label || 'Add to cart'}
-      </button>
+      <a className="btn btn-line btn-sm" href={href} aria-label={`View details for ${name}`}>
+        View details
+      </a>
     </article>
   )
 }
 
-export default function Landing({ page, onOpen, onAdd, cart }) {
+// A shelf card for anything with a detail page.
+const cardOf = (sec, p) => ({
+  media: !p.img ? (
+    p.form && chainOf(p.chain) ? <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} /> : <span className="product-placeholder">Maroon</span>
+  ) : sec === 'charms' ? (
+    <img className="item-charm" src={p.img} alt="" loading="lazy" />
+  ) : (
+    <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} />
+  ),
+  name: p.name,
+  price: npr(p.price ?? priceOf(p.chain, p.charms)),
+  href: `#/${sec}/${p.id}`,
+})
+
+// Under a product: five random pieces from the shop, charms left out. Reshuffled per product, not per render.
+function Recommended({ product }) {
+  const picks = useMemo(() => {
+    const unique = new Map(Object.entries(DETAILS)
+      .filter(([section]) => section !== 'charms')
+      .flatMap(([section, detail]) => detail.items.map((item) => [item.productId || item.id, [section, item]])))
+    unique.delete(product.productId || product.id)
+    return [...unique.values()].map(([section, item]) => [Math.random(), section, item]).sort((a, b) => a[0] - b[0]).slice(0, 5)
+  }, [product])
+
+  return (
+    <Shelf title="You might also like">
+      {picks.map(([, s, p]) => (
+        <Item key={p.id} {...cardOf(s, p)} />
+      ))}
+    </Shelf>
+  )
+}
+
+// One product at #/<section>/<id>: photo, any options, what it is, how to buy it.
+function ProductDetail({ product: p, section, onAdd, onOpen }) {
+  const [pick, setPick] = useState(0)
+  const option = p.options?.[pick]
+  const name = option ? `${p.name}, ${option.label}` : p.name
+  const price = option?.price ?? p.price ?? priceOf(p.chain, p.charms)
+  const color = p.color || (option && option.label)
+  const isCharm = p.kind === 'charm' || (!p.kind && section === 'charms')
+  const size = isCharm && CHARM_SIZES.find((z) => z.id === p.size)
+
+  const facts = [
+    ...((!p.form && DETAILS[section]?.spec) || []),
+    color && `Color: ${color}`,
+    size && `Size: ${size.name}`,
+    p.chain && `Chain: ${chainOf(p.chain)?.name || p.chain}`,
+    p.charms?.length > 0 && `Charms: ${p.charms.map((id) => charmOf(id)?.name || id).join(', ')}`,
+  ].filter(Boolean)
+
+  return (
+    <section className="detail">
+      <a className="detail-back" href={section === 'best' ? '#best' : `#/${section}`}>
+        {section === 'best' ? 'Best sellers' : `All ${PAGES[section].name.toLowerCase()}`}
+      </a>
+      <div className="detail-grid">
+        <div className="detail-photo">
+          {p.img ? (
+            <img className={`item-photo${isCharm ? ' is-cutout' : ''}`} src={option?.img || p.img} alt={name} />
+          ) : p.form && chainOf(p.chain) ? (
+            <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} />
+          ) : <span className="product-placeholder">Maroon</span>}
+        </div>
+        <div className="detail-info">
+          <h1>{p.name}</h1>
+          <span className="price">{npr(price)}</span>
+          {(p.story || p.description || p.line) && <p className="detail-note">{p.story || p.description || p.line}</p>}
+          {p.options && (
+            <div className="detail-pick" role="group" aria-label={`Choose your ${p.color ? 'style' : 'color'}`}>
+              <p>Choose your {p.color ? 'style' : 'color'}</p>
+              <div>
+                {p.options.map((o, i) => (
+                  <button key={o.label} className={i === pick ? 'is-on' : ''} onClick={() => setPick(i)} aria-pressed={i === pick}>
+                    <img src={o.img} alt="" />
+                    <span>{o.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {facts.length > 0 && (
+            <ul className="detail-spec">
+              {facts.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+          {isCharm ? (
+            <button className="btn" onClick={() => onOpen({ ...BUILDS.find((b) => p.compatibleForms?.includes(b.form)), charms: [p.id] })}>
+              Add to a piece
+            </button>
+          ) : p.kind === 'base' ? (
+            <button className="btn" onClick={() => onOpen({ form: p.forms[0], chain: p.id, charms: [] })}>Start with this chain</button>
+          ) : p.kind === 'product' ? (
+            <button className="btn" onClick={() => onAdd(toCartProduct(p, option))}>Add to cart</button>
+          ) : (
+            <button className="btn" onClick={() => onOpen(p)}>Build your own</button>
+          )}
+          {p.form && (
+            <button className="btn btn-line" onClick={() => onOpen(p)}>
+              Customize it
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function Landing({ page, product, section, onOpen, onAdd, cart }) {
   const [onHero, setOnHero] = useState(true)
 
   // Masthead goes maroon while it sits over a maroon section.
@@ -121,39 +233,10 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
     }
-  }, [page])
-
-  const photo = (p) => ({
-    media: p.img ? <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} /> : p.form ? <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} /> : <span className="product-placeholder">Maroon</span>,
-    name: p.name,
-    description: p.description,
-    price: npr(p.price),
-    onMedia: p.form ? () => onOpen(p) : undefined,
-    onAdd: () => onAdd({ type: 'product', productId: p.id, name: p.name, total: p.price, img: p.img }),
-  })
-
-  const piece = (p) => ({
-    media: <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} />,
-    name: p.name,
-    price: npr(priceOf(p.chain, p.charms)),
-    onMedia: () => onOpen(p),
-    onAdd: () => p.kind === 'product' ? onAdd({ type: 'product', productId: p.id, name: p.name, total: p.price, img: p.img }) : onOpen(p),
-  })
+  }, [page, product])
 
   // Each shop page: a photographed banner, then its pieces.
   const pages = {
-    bracelets: BRACELETS.map((p) => <Item key={p.id} {...photo(p)} />),
-    earrings: [
-      buildFor('earrings') && <Item
-        key="hoops"
-        {...piece(buildFor('earrings'))}
-        name="Charm Hoops"
-        price={`From ${npr(chainOf('hoop').price)}`}
-        onAdd={() => onOpen(buildFor('earrings'))}
-        label="Build your own"
-      />,
-      ...EARRINGS.map((e) => <Item key={e.id} {...photo(e)} />),
-    ],
     charms: CHARM_SIZES.map((z) => (
       <section key={z.id} id={z.id} className="charm-size">
         <header className="charm-size-head">
@@ -162,51 +245,29 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
         </header>
         <div className="shelf-row">
           {CHARMS.filter((c) => c.size === z.id && isAvailable(c)).map((c) => (
-            <Item
-              key={c.id}
-              media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
-              name={c.name}
-              price={npr(c.price)}
-              onAdd={() => onOpen({ ...BUILDS.find((b) => c.compatibleForms.includes(b.form)), charms: [c.id] })}
-              label="Add to a piece"
-            />
+            <Item key={c.id} {...cardOf('charms', c)} />
           ))}
         </div>
       </section>
     )),
-    belts: BELTS.map((p) => <Item key={p.id} {...photo(p)} />),
-    armcuffs: ARMCUFFS.map((p) => <Item key={p.id} {...photo(p)} />),
-    chains: REAL_CHAINS.map((c) => (
-      <article key={c.id} className="chain-card">
-        <img src={c.img} alt={`${c.name}, ${c.gauge}`} loading="lazy" />
-        <div className="chain-meta">
-          <h3>{c.name}</h3>
-          <span className="price">
-            {c.gauge} · {npr(c.price)}
-          </span>
-        </div>
-        <p>{c.note}</p>
-        <button className="btn btn-line btn-sm" onClick={() => onOpen({ form: c.forms[0], chain: c.id, charms: [] })}>
-          Start with this chain
-        </button>
-      </article>
-    )),
   }
 
   for (const id of Object.keys(PAGES)) {
-    if (!['charms', 'chains'].includes(id)) pages[id] = (id === 'bracelets' ? BRACELETS : id === 'earrings' ? EARRINGS : id === 'belts' ? BELTS : id === 'armcuffs' ? ARMCUFFS : []).map((p) => <Item key={p.id} {...photo(p)} />)
-    if (!pages[id]) pages[id] = []
+    if (!['charms'].includes(id)) pages[id] = (DETAILS[id]?.items || []).map((p) => <Item key={p.id} {...cardOf(id, p)} />)
   }
-  const dynamicProducts = STORE.products || []
-  pages.chains.push(...dynamicProducts.filter((p) => p.category === 'chains').map((p) => <Item key={p.id} {...photo(p)} />))
-  pages.charms.push(...dynamicProducts.filter((p) => p.category === 'charms').map((p) => <Item key={p.id} {...photo(p)} />))
-  for (const id of Object.keys(PAGES)) if (!['bracelets', 'earrings', 'belts', 'armcuffs', 'charms', 'chains'].includes(id)) pages[id] = dynamicProducts.filter((p) => p.category === id).map((p) => <Item key={p.id} {...photo(p)} />)
+  pages.charms ||= []
+  pages.charms.push(...(STORE.products || []).filter((p) => p.category === 'charms').map((p) => <Item key={p.id} {...cardOf('charms', p)} />))
 
   return (
     <>
       <Masthead page={page} cart={cart} dark={onHero} />
 
-      {page ? (
+      {product ? (
+        <main className="page">
+          <ProductDetail key={product.id} product={product} section={section} onAdd={onAdd} onOpen={onOpen} />
+          <Recommended product={product} />
+        </main>
+      ) : page ? (
         <main className="page">
           <section className="page-hero" style={{ '--img': `url(${PAGES[page].img})` }}>
             <div className="page-hero-copy">
@@ -225,9 +286,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           </section>
           <section className="shelf">
             <p className="page-count">
-              {page === 'charms' ? `${CHARMS.length} charms` : `${pages[page].length} ${page === 'chains' ? 'chains' : 'pieces'}`}
+              {page === 'charms' ? `${CHARMS.length} charms` : `${pages[page].length} pieces`}
             </p>
-            {page === 'charms' ? pages.charms : <div className={page === 'chains' ? 'chain-row' : 'shelf-row'}>{pages[page]}</div>}
+            {page === 'charms' ? pages.charms : <div className="shelf-row">{pages[page]}</div>}
           </section>
         </main>
       ) : (
@@ -330,7 +391,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
 
       <Shelf id="best" title="Best sellers" line="The arrangements people keep coming back for.">
         {BESTSELLERS.map((p) => (
-          <Item key={p.id} {...photo(p)} />
+          <Item key={p.id} {...cardOf('best', p)} onAdd={() => onAdd(toCartProduct(p))} />
         ))}
       </Shelf>
 
@@ -375,7 +436,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
         </figure>
         <div className="close-copy">
           {CLOSE_CHARMS.map((id, i) => (
-            <img key={id} className={`close-charm close-charm-${i}`} src={`/charms/${id}.webp`} alt="" aria-hidden="true" loading="lazy" />
+            <img key={id} className={`close-charm close-charm-${i}`} src={charmOf(id).img} alt="" aria-hidden="true" loading="lazy" />
           ))}
           <Crest />
           <h2>Start with an empty chain</h2>

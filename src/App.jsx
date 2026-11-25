@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Landing, { Footer, Masthead } from './Landing.jsx'
 import Builder from './Builder.jsx'
-import { PAGES, npr, BUILDS, chainsFor, isAvailable, charmOf } from './data.js'
+import { DETAILS, PAGES, npr, BUILDS, chainsFor, isAvailable, charmOf } from './data.js'
 import Checkout, { Policies } from './Checkout.jsx'
 import { addToCart, MAX_QUANTITY, restoreCart } from './cart.js'
 import { ORDER_CHANGED, pendingPayment, saveGuestOrder, forgetUnavailableOrder } from './guestOrders.js'
@@ -21,10 +21,11 @@ export default function App() {
   // is an anchor on the home page.
   const [path, part] = hash.startsWith('#/') ? hash.slice(2).split('/') : []
   const page = PAGES[path] ? path : null
+  const product = DETAILS[path]?.items?.find((item) => item.id === part)
   const commerce = ['cart', 'checkout', 'payment', 'confirmation', 'order', 'policy'].includes(path)
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
   useEffect(() => { localStorage.setItem('maroon-cart', JSON.stringify(cart)) }, [cart])
-  useEffect(() => { document.title = page ? `${PAGES[page].name} · Maroon` : commerce ? `${path[0].toUpperCase() + path.slice(1)} · Maroon` : 'Maroon · Charms that carry a story' }, [page, path, commerce])
+  useEffect(() => { document.title = product ? `${product.name} / Maroon` : page ? `${PAGES[page].name} · Maroon` : commerce ? `${path[0].toUpperCase() + path.slice(1)} · Maroon` : 'Maroon · Charms that carry a story' }, [product, page, path, commerce])
   const openBuilder = (config, keepEditing = false) => {
     if (!keepEditing) setEditing(null)
     const candidate = config || BUILDS[0]
@@ -90,7 +91,7 @@ export default function App() {
   // Moving between sections of the home page glides instead.
   const view = useRef(null)
   useEffect(() => {
-      const now = start ? 'builder' : commerce ? path : page || 'home'
+      const now = start ? 'builder' : commerce ? path : product ? `${path}/${product.id}` : page || 'home'
     const glide = view.current === now
     view.current = now
     const el = now === 'home' ? hash.length > 1 && document.getElementById(hash.slice(1)) : part && document.getElementById(part)
@@ -99,7 +100,7 @@ export default function App() {
       top: el ? Math.max(0, el.getBoundingClientRect().top + window.scrollY - bar) : 0,
       behavior: glide ? 'smooth' : 'instant',
     })
-  }, [start, page, hash, commerce, path])
+  }, [start, product, page, hash, commerce, path])
 
   useEffect(() => {
     if (!receipt) return
@@ -123,6 +124,8 @@ export default function App() {
       ) : commerce ? <><Masthead cart={cartCount} />{path === 'policy' ? <Policies policy={part} /> : <Checkout key={path} cart={cart} setCart={setCart} mode={path === 'order' ? 'payment' : path} onEdit={edit} pendingPayment={unpaid} />}<Footer /></> : (
         <Landing
           page={page}
+          product={product}
+          section={path}
           onOpen={openBuilder}
           onAdd={add}
           cart={cartCount}

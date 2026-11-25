@@ -4,8 +4,32 @@ import { addToCart, restoreCart, MAX_QUANTITY } from './cart.js'
 import { isPaymentPending, pendingPayment, saveGuestOrder, forgetUnavailableOrder } from './guestOrders.js'
 import { adminRedirectUrl } from './routing.js'
 import { validatePaymentDetails } from './paymentValidation.js'
+import { presentProducts, toCartProduct } from './productCatalog.js'
 
 const product = { type: 'product', productId: 'pearl-hoops', name: 'Pearl hoops', total: 3200 }
+test('detail options retain server identities, current prices and availability after catalog installation', () => {
+  const records = [
+    { kind: 'product', id: 'belt-black', name: 'Black belt', price: 2800, img: '/current-black.jpg' },
+    { kind: 'product', id: 'belt-brown', name: 'Brown belt', price: 3100, img: '/current-brown.jpg' },
+  ]
+  const templates = [{ id: 'belt-slim', name: 'Slim Belt', price: 1, options: [
+    { label: 'Black', productId: 'belt-black', price: 1 },
+    { label: 'Dark brown', productId: 'belt-brown', price: 1 },
+    { label: 'Unavailable', productId: 'not-published', price: 1 },
+  ] }]
+  const [group] = presentProducts(records, templates)
+  assert.equal(group.id, 'belt-slim')
+  assert.equal(group.options.length, 2)
+  const choice = toCartProduct(group, group.options[1])
+  assert.equal(choice.type, 'product')
+  assert.equal(choice.productId, 'belt-brown')
+  assert.equal(choice.total, 3100)
+  assert.equal(choice.img, '/current-brown.jpg')
+  const bag = addToCart(addToCart([], choice), choice)
+  assert.equal(bag.length, 1)
+  assert.equal(bag[0].quantity, 2)
+  assert.equal(records[1].price, 3100)
+})
 test('payment identifies missing/short references while accepting either evidence option', () => {
   assert.match(validatePaymentDetails('  ', null).reference, /Enter the transaction reference/)
   assert.match(validatePaymentDetails('12', null).reference, /at least 3 characters/)
