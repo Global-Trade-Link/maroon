@@ -2,17 +2,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flourish, Frame } from './Ornament.jsx'
 import Piece, { VIEW, geometry } from './Piece.jsx'
 import { Footer, Masthead } from './Landing.jsx'
-import { ASSEMBLY, BUILDS, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack } from './data.js'
+import { ASSEMBLY, BUILDS, charmOf, CHARMS, CHARM_SIZES, chainOf, chainsFor, formOf, nextFreeSlot, npr, priceOf, seedRack, isAvailable } from './data.js'
 
-export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
+export default function Builder({ start, cart, onBack, onAdd, onSwitch, editing = false }) {
   // One builder per form: a bracelet page never turns into a necklace page.
   const form = start.form
   const chains = chainsFor(form)
   const startChain = chains.some((c) => c.id === start.chain) ? start.chain : chains[0].id
   const [chain, setChain] = useState(startChain)
   const [size, setSize] = useState(() => charmOf(start.charms[0])?.size || 'small')
-  const [assembly, setAssembly] = useState('exact')
-  const [rack, setRack] = useState(() => seedRack(start.form, start.charms, startChain))
+  const [assembly, setAssembly] = useState(start.assembly || 'exact')
+  const [rack, setRack] = useState(() => {
+    if (!start.rack || startChain !== start.chain) return seedRack(start.form, start.charms, startChain)
+    const slots = seedRack(start.form, [], startChain)
+    return slots.map((_, i) => isAvailable(charmOf(start.rack[i])) && charmOf(start.rack[i]).compatibleForms.includes(form) ? start.rack[i] : null)
+  })
   const [drag, setDrag] = useState(null)
   const [toast, setToast] = useState('')
 
@@ -187,7 +191,7 @@ export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
       <Masthead cart={cart} onNav={onBack} />
       <div className="bench-head">
         <button className="bench-back" onClick={onBack}>
-          ← All pieces
+          ← {editing ? 'Back to bag' : 'All pieces'}
         </button>
         <p className="bench-name">Build your own {formOf(form).name.toLowerCase()}</p>
       </div>
@@ -254,7 +258,7 @@ export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
               ref={trashRef}
               className="bar-cta"
               onClick={() =>
-                onAdd({ form, chain, charms: rack.filter(Boolean), assembly, total })
+                onAdd({ type: 'custom', form, chain, charms: rack.filter(Boolean), rack: [...rack], assembly, total, name: `Custom ${form}`, quantity: 1 })
               }
             >
               {drag ? (
@@ -273,7 +277,7 @@ export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
                 </>
               ) : (
                 <>
-                  Add <span className="cta-long">my design</span> to cart
+                  {editing ? 'Save changes' : <>Add <span className="cta-long">my design</span> to cart</>}
                 </>
               )}
             </button>
@@ -302,6 +306,7 @@ export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
             ) : (
               <p className="bench-on-empty">Nothing hung yet. Tap a charm on the right to start.</p>
             )}
+            <details className="bench-arrange"><summary>Arrange by slot</summary><p>Choose a charm for each numbered spot. Empty spots stay in your saved layout.</p><div>{rack.map((id, index) => <label key={index}>Slot {index + 1}<select value={id || ''} onChange={(e) => setRack((previous) => previous.map((charm, slot) => slot === index ? e.target.value || null : charm))}><option value="">Empty</option>{CHARMS.filter((c) => isAvailable(c) && c.compatibleForms?.includes(form)).map((c) => <option key={c.id} value={c.id}>{c.name} · {npr(c.price)}</option>)}</select></label>)}</div></details>
           </div>
         </div>
 
@@ -367,7 +372,7 @@ export default function Builder({ start, cart, onBack, onAdd, onSwitch }) {
             <p className="panel-note sizes-note">{CHARM_SIZES.find((z) => z.id === size).line}</p>
 
             <div className="tiles tiles-charm" role="tabpanel">
-              {CHARMS.filter((c) => c.size === size).map((c) => {
+              {CHARMS.filter((c) => c.size === size && isAvailable(c) && c.compatibleForms?.includes(form)).map((c) => {
                 const n = countOf(c.id)
                 return (
                   <div key={c.id} className={`tile${n ? ' is-on' : ''}`}>

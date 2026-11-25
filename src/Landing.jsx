@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { PaymentContext } from './PaymentContext.js'
 import Piece from './Piece.jsx'
 import { PromiseIcon } from './Icons.jsx'
 import { Crest, Flourish, Frame } from './Ornament.jsx'
@@ -20,6 +21,8 @@ import {
   npr,
   priceOf,
   seedRack,
+  STORE,
+  isAvailable,
 } from './data.js'
 
 
@@ -28,9 +31,9 @@ const buildFor = (form) => BUILDS.find((b) => b.form === form)
 
 // The hero wall: photographed best sellers plus a stacked-wrist shot, edge to edge behind the copy.
 const REEL = [
-  ...['best-seaside', 'best-citrus'].map((id) => BESTSELLERS.find((p) => p.id === id).img),
+  ...['best-seaside', 'best-citrus'].map((id) => BESTSELLERS.find((p) => p.id === id)?.img || '/shop/best4.jpg'),
   '/shop/hero-stack.jpg',
-  BESTSELLERS.find((p) => p.id === 'best-pearl-hoops').img,
+  BESTSELLERS.find((p) => p.id === 'best-pearl-hoops')?.img || '/shop/best1.jpg',
 ]
 
 // One face for each charm size; the builder opens on that size's tab.
@@ -42,7 +45,7 @@ const CLOSE_CHARMS = ['cherry', 'starfish', 'blossom', 'letter']
 const GARLAND = ['pearl', 'cherry', 'shell', 'bow', 'blossom', 'letter', 'turtle', 'porcheart', 'starfish', 'tear', 'locket', 'cube', 'boot']
 
 // Chains you can choose; the fixed bases (hoops, keyring, pin) live in their own builders.
-const REAL_CHAINS = CHAINS.filter((c) => c.forms.includes('bracelet') || c.forms.includes('necklace'))
+const REAL_CHAINS = CHAINS.filter((c) => isAvailable(c) && (c.forms.includes('bracelet') || c.forms.includes('necklace')))
 
 // Gold line with charms hanging off it; shared by the masthead and the footer.
 function Garland({ className = '' }) {
@@ -58,7 +61,7 @@ function Garland({ className = '' }) {
 }
 
 // The masthead skips Chains for room; the footer lists every page.
-const NAV_PAGES = ['bracelets', 'earrings', 'charms', 'belts', 'armcuffs']
+const NAV_PAGES = Object.keys(PAGES).filter((id) => id !== 'chains')
 
 function Shelf({ id, title, line, children }) {
   return (
@@ -73,7 +76,7 @@ function Shelf({ id, title, line, children }) {
 }
 
 // One product on a shelf: media, plain black name and price, line button.
-function Item({ media, name, price, onMedia, onAdd, label }) {
+function Item({ media, name, price, onMedia, onAdd, label, description }) {
   return (
     <article className="item">
       {onMedia ? (
@@ -84,6 +87,7 @@ function Item({ media, name, price, onMedia, onAdd, label }) {
         <span className="item-media">{media}</span>
       )}
       <h3>{name}</h3>
+      {description && <p className="item-description">{description}</p>}
       <span className="price">{price}</span>
       <button className="btn btn-line btn-sm" onClick={onAdd}>
         {label || 'Add to cart'}
@@ -120,11 +124,12 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
   }, [page])
 
   const photo = (p) => ({
-    media: <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} />,
+    media: p.img ? <img className="item-photo" src={p.img} alt="" loading="lazy" style={{ '--focus': p.focus }} /> : p.form ? <Piece form={p.form} chain={p.chain} charms={seedRack(p.form, p.charms, p.chain)} idle={false} /> : <span className="product-placeholder">Maroon</span>,
     name: p.name,
+    description: p.description,
     price: npr(p.price),
     onMedia: p.form ? () => onOpen(p) : undefined,
-    onAdd: () => onAdd({ name: p.name, total: p.price }),
+    onAdd: () => onAdd({ type: 'product', productId: p.id, name: p.name, total: p.price, img: p.img }),
   })
 
   const piece = (p) => ({
@@ -132,14 +137,14 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
     name: p.name,
     price: npr(priceOf(p.chain, p.charms)),
     onMedia: () => onOpen(p),
-    onAdd: () => onAdd({ name: p.name, total: priceOf(p.chain, p.charms) }),
+    onAdd: () => p.kind === 'product' ? onAdd({ type: 'product', productId: p.id, name: p.name, total: p.price, img: p.img }) : onOpen(p),
   })
 
   // Each shop page: a photographed banner, then its pieces.
   const pages = {
-    bracelets: BRACELETS.map((p) => <Item key={p.id} {...piece(p)} />),
+    bracelets: BRACELETS.map((p) => <Item key={p.id} {...photo(p)} />),
     earrings: [
-      <Item
+      buildFor('earrings') && <Item
         key="hoops"
         {...piece(buildFor('earrings'))}
         name="Charm Hoops"
@@ -156,13 +161,13 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
           <p>{z.line}</p>
         </header>
         <div className="shelf-row">
-          {CHARMS.filter((c) => c.size === z.id).map((c) => (
+          {CHARMS.filter((c) => c.size === z.id && isAvailable(c)).map((c) => (
             <Item
               key={c.id}
               media={<img className="item-charm" src={c.img} alt="" loading="lazy" />}
               name={c.name}
               price={npr(c.price)}
-              onAdd={() => onOpen({ ...BUILDS[0], charms: [c.id] })}
+              onAdd={() => onOpen({ ...BUILDS.find((b) => c.compatibleForms.includes(b.form)), charms: [c.id] })}
               label="Add to a piece"
             />
           ))}
@@ -187,6 +192,15 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       </article>
     )),
   }
+
+  for (const id of Object.keys(PAGES)) {
+    if (!['charms', 'chains'].includes(id)) pages[id] = (id === 'bracelets' ? BRACELETS : id === 'earrings' ? EARRINGS : id === 'belts' ? BELTS : id === 'armcuffs' ? ARMCUFFS : []).map((p) => <Item key={p.id} {...photo(p)} />)
+    if (!pages[id]) pages[id] = []
+  }
+  const dynamicProducts = STORE.products || []
+  pages.chains.push(...dynamicProducts.filter((p) => p.category === 'chains').map((p) => <Item key={p.id} {...photo(p)} />))
+  pages.charms.push(...dynamicProducts.filter((p) => p.category === 'charms').map((p) => <Item key={p.id} {...photo(p)} />))
+  for (const id of Object.keys(PAGES)) if (!['bracelets', 'earrings', 'belts', 'armcuffs', 'charms', 'chains'].includes(id)) pages[id] = dynamicProducts.filter((p) => p.category === id).map((p) => <Item key={p.id} {...photo(p)} />)
 
   return (
     <>
@@ -220,8 +234,8 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
       <>
       <section className="hero" id="top">
         <div className="hero-wall" aria-hidden="true">
-          {REEL.map((src) => (
-            <img key={src} src={src} alt="" />
+          {[STORE.heroImage || REEL[0], ...REEL.slice(1)].map((src, i) => (
+            <img key={i} src={src} alt="" />
           ))}
         </div>
         <Garland className="hero-garland" />
@@ -231,12 +245,9 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
             <span>18K gold PVD</span>
             <span>Waterproof</span>
           </p>
-          <h1>
-            Charms that carry <span>a story</span>
-          </h1>
+          <h1>{STORE.heroTitle}</h1>
           <p className="hero-lede">
-            Pick the chain, hang the charms, and move them link by link until the piece reads
-            the way you meant it. Then we set it by hand and send it to you.
+            {STORE.heroText}
           </p>
           <div className="hero-acts">
             <button className="btn" onClick={() => onOpen(BUILDS[0])}>
@@ -255,10 +266,11 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
         <p className="hero-story-sub">Every charm tells a piece of the story</p>
         <p className="hero-story-lede">Four sizes, from a dainty drop to a heavy locket. Tap one to see them all.</p>
         <ul>
-          {SIZE_FACES.map(([size, id]) => {
-            const c = CHARMS.find((x) => x.id === id)
-            const z = CHARM_SIZES.find((x) => x.id === size)
-            const count = CHARMS.filter((x) => x.size === size).length
+          {CHARM_SIZES.filter((z) => CHARMS.some((x) => x.size === z.id && isAvailable(x))).map((z) => {
+            const size = z.id
+            const available = CHARMS.filter((x) => x.size === size && isAvailable(x))
+            const c = available[0]
+            const count = available.length
             return (
               <li key={size}>
                 <a href={`#/charms/${size}`} aria-label={`See the ${z.name.toLowerCase()} charms`}>
@@ -266,7 +278,7 @@ export default function Landing({ page, onOpen, onAdd, cart }) {
                 </a>
                 <span>{z.name}</span>
                 <small>
-                  {count} charms · from {npr(Math.min(...CHARMS.filter((x) => x.size === size).map((x) => x.price)))}
+                  {count} charms · from {npr(Math.min(...available.map((x) => x.price)))}
                 </small>
               </li>
             )
@@ -459,10 +471,12 @@ export function Footer({ onNav }) {
           ))}
         </ul>
         <p className="foot-vow">18K gold PVD · Waterproof · Hypoallergenic · Fast dispatch</p>
-        <p className="foot-note">
-          Demo storefront. All photography is real; prices, names and stock are placeholders in
-          Nepalese rupees and charge nothing.
-        </p>
+        <nav aria-label="Store information"><a href="#/policy/contact">Contact</a><a href="#/policy/deliveryPolicy">Delivery</a><a href="#/policy/returnsPolicy">Returns</a><a href="#/policy/privacyPolicy">Privacy</a><a href="#/policy/terms">Terms</a></nav>
+        {STORE.contactPhone && <p><a href={`tel:${STORE.contactPhone}`}>{STORE.contactPhone}</a></p>}
+        {STORE.contactEmail && <p><a href={`mailto:${STORE.contactEmail}`}>{STORE.contactEmail}</a></p>}
+        {STORE.businessAddress && <p>{STORE.businessAddress}</p>}
+        {STORE.instagram && <a href={STORE.instagram} target="_blank" rel="noreferrer">Instagram</a>}
+        <p className="foot-note">Prices in Nepalese rupees. Made personal, set by hand.</p>
       </div>
     </footer>
   )
@@ -471,6 +485,7 @@ export function Footer({ onNav }) {
 // The site navbar, shared with the builder; onNav lets the builder close before a link jumps.
 export function Masthead({ page, cart, dark = false, onNav }) {
   const [menu, setMenu] = useState(false) // mobile menu panel
+  const unpaid = useContext(PaymentContext)
 
   // Mobile menu closes on page change, Escape, or a tap outside the masthead.
   useEffect(() => setMenu(false), [page])
@@ -509,9 +524,10 @@ export function Masthead({ page, cart, dark = false, onNav }) {
             {PAGES[id].name}
           </a>
         ))}
+        {unpaid ? <a href="#/payment" aria-label="Resume payment">Payment</a> : cart > 0 && <a href="#/checkout">Checkout</a>}
       </nav>
-      <a className="btn btn-sm" href="#build">
-        Shop
+      <a className="btn btn-sm" href="#/cart">
+        Bag
         {cart > 0 && <em aria-label={`${cart} in bag`}>{cart}</em>}
       </a>
     </header>

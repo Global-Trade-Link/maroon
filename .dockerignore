@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env*
+docs
+.proposal-work
+.impeccable
+assets
+Maroon Products
+marron_product_2
+test-results

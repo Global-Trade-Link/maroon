@@ -4,11 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
+    "test": "node --test src/commerce.test.js",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "lucide-react": "^1.69.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

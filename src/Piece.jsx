@@ -66,10 +66,10 @@ export function geometry(formId, chainId) {
   const form = formOf(formId)
   const chain = chainOf(chainId)
   if (formId === 'earrings') {
-    return { links: [], ends: [], slots: HOOP_SLOTS.map((h) => ({ ...h, ang: 0 })), scale: 2, chain, form }
+    return { links: [], ends: [], slots: HOOP_SLOTS.slice(0, slotsOf(formId, chainId)).map((h) => ({ ...h, ang: 0 })), scale: 2, chain, form }
   }
   if (formId === 'brooch') {
-    return { links: [], ends: [], slots: PIN_LOOPS.map((x) => ({ x, y: 322, ang: 0 })), scale: 1.4, chain, form }
+    return { links: [], ends: [], slots: PIN_LOOPS.slice(0, slotsOf(formId, chainId)).map((x) => ({ x, y: 322, ang: 0 })), scale: 1.4, chain, form }
   }
   if (formId === 'keyring') {
     const n = slotsOf(formId, chainId)

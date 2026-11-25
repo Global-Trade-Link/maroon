@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-28T00:00:00Z",
+  "generatedAt": "2026-11-25T00:00:00Z",
   "title": "Design System: Maroon",
   "extensions": {
     "colorMeta": {
@@ -60,11 +60,11 @@
       },
       "headline": {
         "displayName": "Section Script",
-        "purpose": "Section and panel headings."
+        "purpose": "Storefront and checkout section and panel headings."
       },
       "body": {
         "displayName": "Italic Body",
-        "purpose": "All paragraphs, maroon."
+        "purpose": "Storefront and checkout supporting copy, maroon; form labels and field help use sans."
       },
       "product": {
         "displayName": "Product",
@@ -137,7 +137,7 @@
   ],
   "narrative": {
     "northStar": "The Boutique Counter",
-    "overview": "Palest beige ground, maroon voice, gold product. Headings speak in maroon script, body copy in maroon italic serif, and everything purchasable is plain black sans. CTAs are maroon with white type.",
+    "overview": "Palest beige ground, maroon voice, gold product. Storefront and checkout headings speak in maroon script, supporting copy in maroon italic serif, and products, prices and controls in plain black sans. CTAs are maroon with white type. The owner studio uses compact upright sans throughout.",
     "keyCharacteristics": [
       "Lightest beige background",
       "Maroon script headings",
@@ -148,7 +148,7 @@
     "rules": [
       {
         "name": "Three Voices",
-        "body": "Script for headings, italic serif for body, black sans for products, prices and controls. Never swap roles.",
+        "body": "Storefront and checkout use script headings, italic serif supporting copy, black sans products, prices and controls. Checkout shares the storefront Masthead, Footer and pill CTAs. The owner studio uses upright sans for headings, supporting text and controls.",
         "section": "typography"
       },
       {

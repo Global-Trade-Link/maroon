@@ -114,7 +114,8 @@ export const CHAINS = [
   },
 ]
 
-export const chainsFor = (formId) => CHAINS.filter((c) => c.forms.includes(formId))
+export const isAvailable = (p) => p && p.published !== false && p.available !== false
+export const chainsFor = (formId) => CHAINS.filter((c) => c.forms.includes(formId) && isAvailable(c))
 
 // The four charm sizes, small to bulky. Sizes are the studio's own sorting.
 export const CHARM_SIZES = [
@@ -318,7 +319,7 @@ export function nextFreeSlot(rack) {
 }
 
 // A chain can cap its own spots (the fine chain is a one-charm pendant).
-export const slotsOf = (formId, chainId) => chainOf(chainId)?.slots ?? formOf(formId).slots
+export const slotsOf = (formId, chainId) => Math.min(chainOf(chainId)?.slots ?? formOf(formId).slots, formOf(formId).slots)
 
 export function seedRack(formId, charms, chainId) {
   const out = Array(slotsOf(formId, chainId)).fill(null)
@@ -326,4 +327,34 @@ export function seedRack(formId, charms, chainId) {
   const offset = Math.floor((out.length - list.length) / 2)
   list.forEach((id, i) => (out[offset + i] = id))
   return out
+}
+
+export let STORE = {}
+// Install the server catalog before importing the storefront. Existing geometry
+// metadata stays attached to known assets, while owner edits are authoritative.
+export function installCatalog(snapshot) {
+  STORE = snapshot.settings
+  const all = snapshot.catalog
+  const replace = (target, records) => target.splice(0, target.length, ...records)
+  const merge = (target, kind) => {
+    const old = new Map(target.map((p) => [p.id, p]))
+    replace(target, all.filter((p) => p.kind === kind).map((p) => ({ ...old.get(p.id), ...p })))
+  }
+  merge(CHAINS, 'base'); merge(CHARMS, 'charm'); merge(CHARM_SIZES, 'charmType')
+  const categories = all.filter((p) => p.kind === 'category' && isAvailable(p))
+  for (const key of Object.keys(PAGES)) delete PAGES[key]
+  categories.forEach((p) => { PAGES[p.id] = { ...p, line: p.line || '' } })
+  replace(CATEGORIES, categories.filter((p) => p.id !== 'chains'))
+  const products = all.filter((p) => p.kind === 'product' && isAvailable(p) && PAGES[p.category])
+  const validComposition = (p) => !p.form || (isAvailable(chainOf(p.chain)) && p.charms.every((id) => isAvailable(charmOf(id))))
+  const visible = products.filter(validComposition)
+  STORE.products = visible
+  replace(BESTSELLERS, visible.filter((p) => p.featured))
+  for (const [category, target] of Object.entries({ bracelets: BRACELETS, earrings: EARRINGS, belts: BELTS, armcuffs: ARMCUFFS })) replace(target, visible.filter((p) => p.category === category))
+  replace(PRESETS, visible.filter((p) => p.form).slice(0, 3))
+  replace(BUILDS, [...BUILDS].flatMap((b) => {
+    const base = chainsFor(b.form).find((c) => c.id === b.chain) || chainsFor(b.form)[0]
+    if (!base) return []
+    return [{ ...b, chain: base.id, charms: b.charms.filter((id) => isAvailable(charmOf(id)) && charmOf(id).compatibleForms?.includes(b.form)).slice(0, slotsOf(b.form, base.id)) }]
+  }))
 }

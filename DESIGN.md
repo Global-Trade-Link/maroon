@@ -11,6 +11,10 @@ colors:
   maroon-soft: "#8f4a50"
   ink: "#15110f"
   white: "#ffffff"
+  studio-sidebar: "#f5eee5"
+  studio-muted: "#76635f"
+  studio-border: "#e7ddd3"
+  studio-field: "#fffefa"
 typography:
   display:
     fontFamily: "'Pinyon Script', 'Snell Roundhand', cursive"
@@ -40,10 +44,30 @@ typography:
     fontWeight: 600
     letterSpacing: "0.16em"
     textTransform: uppercase
+  studio-body:
+    fontFamily: "'League Spartan', Futura, sans-serif"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.5
+  studio-title:
+    fontFamily: "'League Spartan', Futura, sans-serif"
+    fontSize: "30px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.025em"
+  studio-heading:
+    fontFamily: "'League Spartan', Futura, sans-serif"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.01em"
 rounded:
   frame: "14px"
   slot: "8px"
   pill: "999px"
+  studio-panel: "12px"
+  studio-control: "7px"
+  studio-field: "6px"
 spacing:
   gutter: "clamp(16px, 4vw, 56px)"
   section: "clamp(60px, 8vw, 120px)"
@@ -65,6 +89,15 @@ components:
   product-frame:
     backgroundColor: "{colors.bg-tint}"
     rounded: "{rounded.frame}"
+  studio-button:
+    backgroundColor: "{colors.maroon}"
+    textColor: "{colors.white}"
+    rounded: "{rounded.studio-control}"
+    padding: "10px 16px"
+  studio-panel:
+    backgroundColor: "{colors.card}"
+    rounded: "{rounded.studio-panel}"
+    padding: "25px"
 ---
 
 # Maroon — design notes
@@ -123,4 +156,45 @@ Categories without photography (earrings, brooch, keyring, belts, armcuffs) show
 - Elevation is a hairline (`rgba(110,31,39,0.16)`) or one soft lift shadow, never both.
 - Charm cut-outs sit on cream or white stages only.
 - Drag slots in the builder are dashed maroon; no other colour enters.
-- Prices, names and stock are placeholders and the footer says so.
+- Customer-facing pages and the shared footer carry no sample or test notices.
+
+## Components
+
+### Owner studio
+
+The owner studio extends the same cream and maroon world with compact,
+upright League Spartan text. It uses the existing sans face for headings, help
+copy, labels, tables and controls; storefront script and italic serif remain the
+editorial voices. Use studio-body for readable supporting text, studio-title for
+main headings and studio-heading for panel headings. Main headings
+reduce to 26px in the mobile studio.
+
+The desktop studio uses a fixed left navigation (248px), a thin breadcrumb header
+(72px minimum height) and a workspace capped at 1550px. Main padding is
+38px 36px 56px. Editors pair the form with a save/visibility rail (290px), then
+stack at 950px. At 760px and below the navigation becomes a drawer, main padding
+reduces to 26px 18px 40px, and panels use 20px padding. Closed navigation is inert;
+opening it contains keyboard focus, Escape closes it and focus returns to the menu.
+
+Use the studio sidebar tint for navigation, card white for panels, the studio
+border for hairline separation and muted brown for supporting text. Panels are
+flat with the studio panel radius; primary actions use the studio control radius,
+maroon fill, white text and a deeper maroon hover. Fields have their own smaller
+radius, warm white fill, a quiet border and a 42px minimum height. Preserve clear
+maroon keyboard focus. Outline icons support labels; status chips pair their
+subdued green, amber or maroon tint with explicit status text.
+
+### Storefront checkout
+
+The bag, guest checkout, payment and confirmation share the storefront Masthead
+and Footer. Keep maroon script titles and section headings, italic serif supporting
+copy, and black sans product names, prices, field labels and controls. Primary
+actions retain the storefront pill shape, maroon fill and white type.
+
+The content is capped at 1240px with a main form and tinted summary rail (370px),
+separated by 56px. At 1000px the rail narrows to 320px and the gap to 32px. At
+760px the layout becomes one column with the summary after the form; paired
+fields stack at 440px. Confirmation pairs the summary and delivery details, then
+stacks them at 760px. Keep labels visible above fields and totals aligned with
+tabular figures. Fields use a quiet maroon hairline, warm card white, a 6px radius
+and a 48px minimum height; preserve clear maroon keyboard focus.
